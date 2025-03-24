@@ -1,52 +1,62 @@
 import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs"
 import TabBarButton from './TabBarButton';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
-
     const [dimensions, setDimensions] = useState({
-        width: 20,
-        height: 100
-    })
+        width: 0,
+        height: 0
+    });
 
+    // Calculate button width based on available space
     const buttonWidth = dimensions.width / state.routes.length;
+
+    // Calculate center position for each tab button
+    const getTabCenterPosition = (index: number) => {
+        return (buttonWidth * index) + (buttonWidth / 2);
+    };
 
     const onTabbarLayout = (e: LayoutChangeEvent) => {
         setDimensions({
             height: e.nativeEvent.layout.height,
             width: e.nativeEvent.layout.width
-        })
-    }
+        });
+    };
 
+    // Animation value for the tab indicator
     const tabPositionX = useSharedValue(0);
+
+    // Set initial position on first render
+    useEffect(() => {
+        // Set initial position based on the active tab
+        if (dimensions.width > 0) {
+            tabPositionX.value = getTabCenterPosition(state.index) - 25; // Adjust for half of indicator width
+        }
+    }, [dimensions.width, state.index]);
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
             transform: [{
                 translateX: tabPositionX.value
             }]
-        }
-    })
-
+        };
+    });
 
     return (
         <View onLayout={onTabbarLayout} style={styles.tabBar}>
+            {/* First tab indicator element */}
+            <Animated.View style={[
+                styles.leftIndicator,
+                animatedStyle
+            ]} />
 
-            <Animated.View style={
-                [{
-                    position: 'absolute',
-                    backgroundColor: '#723FEB',
-                    borderRadius: 30,
-                    marginHorizontal: 12,
-                    height: dimensions.height - 15,
-                    width: buttonWidth - 25
-
-                }, animatedStyle]
-            }>
-
-            </Animated.View>
+            {/* Second tab indicator element */}
+            <Animated.View style={[
+                styles.rightIndicator,
+                animatedStyle
+            ]} />
 
             {state.routes.map((route, index) => {
                 const { options } = descriptors[route.key];
@@ -60,8 +70,11 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                 const isFocused = state.index === index;
 
                 const onPress = () => {
-
-                    tabPositionX.value = withSpring(buttonWidth * index, { duration: 1500 })
+                    // Animate to the center of the new tab button, adjusting for indicator width
+                    tabPositionX.value = withSpring(
+                        getTabCenterPosition(index) - 25, // Adjust for half of indicator width
+                        { duration: 500 }
+                    );
 
                     const event = navigation.emit({
                         type: 'tabPress',
@@ -82,8 +95,8 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
                 };
 
                 return (
-
                     <TabBarButton
+                        key={route.key}
                         onPress={onPress}
                         onLongPress={onLongPress}
                         isFocused={isFocused}
@@ -99,15 +112,14 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
 
 const styles = StyleSheet.create({
     tabBar: {
-        position: "absolute",
-        bottom: 20,
+        position: "relative",
+        width: "100%",
         flexDirection: "row",
         justifyContent: 'space-between',
         alignItems: "center",
         backgroundColor: "#fff",
-        marginHorizontal: 50,
         paddingVertical: 15,
-        borderRadius: 35,
+        borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: {
             width: 20,
@@ -115,7 +127,30 @@ const styles = StyleSheet.create({
         },
         shadowRadius: 50,
         shadowOpacity: 0.5,
-        elevation: 2
+        elevation: 2,
+    },
+    leftIndicator: {
+        position: 'absolute',
+        top: 34,
+        width: 25,
+        height: 25,
+        borderLeftWidth: 4,
+        borderBottomWidth: 4,
+        borderColor: '#CC5500',
+        borderRadius: 5,
+        zIndex: 1,
+    },
+    rightIndicator: {
+        position: 'absolute',
+        top: 15,
+        width: 25,
+        height: 25,
+        borderRightWidth: 4,
+        borderTopWidth: 4,
+        borderColor: '#CC5500',
+        borderRadius: 5,
+        zIndex: 1,
+        marginLeft: 18, // Offset from the left indicator
     },
     tabBarItem: {
         flex: 1,
@@ -123,6 +158,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 5
     }
-})
+});
 
-export default TabBar
+export default TabBar;

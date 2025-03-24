@@ -1,8 +1,11 @@
+// app/_layout.tsx
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
+import { Toaster } from "sonner-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,9 +25,12 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="details" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* <Stack.Screen name="login" /> */}
+        {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
+      </Stack>
+      <Toaster position="bottom-center" />
+    </GestureHandlerRootView>
   );
 }

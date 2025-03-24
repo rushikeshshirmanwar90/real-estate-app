@@ -1,0 +1,20 @@
+{
+  "_id": "67dfdfe4232d33fa6475f536",
+  "flatId": "67d7532a18ae14c87a1cd929",
+  "flatName": "102",
+  "payments": [
+    { "date": "2025-03-23", "percentage": "10%", "title": "Booking Amount" }
+  ],
+  "projectId": "67b396c1827b34ec3620ec88",
+  "projectName": "Kameshwari Heights",
+  "sectionId": "67d7532a18ae14c87a1cd926",
+  "sectionName": "Tower A",
+  "sectionType": "Buildings"
+}
+
+
+interface FlatProps {
+  _id : string,
+  flatId : string,
+  flatName : 
+}

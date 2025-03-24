@@ -1,101 +1,189 @@
-import { StyleSheet, Text, View, Image, useWindowDimensions } from 'react-native';
 import React from 'react';
-import { FontAwesome } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
 
-const ProjectCard = () => {
-    const { width } = useWindowDimensions();
-    const router = useRouter();
+const { width } = Dimensions.get('window');
+
+// Simplified Project interface with only necessary data
+export interface ProjectData {
+    _id: string;
+    name: string;
+    images: string[];
+    city: string;
+    state: string;
+    area: string;
+    section: {
+        name: string;
+        type: string;
+        _id: string;
+    }[];
+}
+
+interface PropertyCardProps {
+    project: ProjectData;
+    onPress?: () => void;
+}
+
+const PropertyCard = ({ project, onPress }: PropertyCardProps) => {
 
     return (
-        <View style={[styles.card, { width: width * 0.9 }]}>
-            {/* Background Image */}
-            <Image
-                source={require('../assets/images/images/img (1).jpg')}
-                style={styles.image}
-            />
-            {/* Details Container */}
-            <View style={styles.detailsContainer}>
-                {/* Title */}
-                <View style={{ display: "flex", flexDirection: "row", gap: 45 }} >
-                    <Text style={styles.title}>Midnight Ridge Villa</Text>
-                    <Text style={styles.price}>$ 452.00/month</Text>
-                </View>
-                {/* Location */}
-                <Text style={styles.location}>
-                    <FontAwesome name="map-marker" size={14} color="#888" /> 460 Thamrin Jakarta, Indonesia
-                </Text>
+        <View style={styles.cardContainer}>
+            <View>
+                {project.images && project.images.length > 0 ? (
+                    <Image
+                        style={styles.imageSection}
+                        source={{ uri: project.images[0] }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.imageSection}
+                        source={require('@/assets/images/images/img (1).jpg')}
+                    />
+                )}
             </View>
-            {/* Bookmark Icon */}
-            <View style={styles.bookmarkContainer}>
-                <FontAwesome name="bookmark" size={24} color="#3b82f6" />
+
+            <View style={styles.detailsSection}>
+                <Text style={styles.title}>{project.name}</Text>
+
+                <View style={styles.locationContainer}>
+                    <EvilIcons name="location" size={24} color="black" />
+                    <Text style={styles.locationText}>
+                        {project.city}, {project.state}
+                    </Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                    <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>Area</Text>
+                        <Text style={styles.infoValue}>{project.area} sq.ft</Text>
+                    </View>
+                </View>
+
+                <Text style={styles.sectionTitle}>Sections:</Text>
+
+                <View style={styles.sectionsContainer}>
+                    {project.section.map((section, index) => (
+                        <Text key={section._id || index} style={styles.sectionItem}>
+                            {section.name} ({section.type})
+                        </Text>
+                    ))}
+                </View>
+
+                <View style={styles.divider}></View>
+
+                <TouchableOpacity style={styles.button} onPress={onPress}>
+                    <Text style={styles.buttonText}>View Details</Text>
+                    <Icon name="arrow-right" size={16} color="#fff" style={styles.buttonIcon} />
+                </TouchableOpacity>
             </View>
         </View>
     );
 };
 
-export default ProjectCard;
-
 const styles = StyleSheet.create({
-    card: {
-        borderRadius: 16,
+    cardContainer: {
+        width: width * 0.9,
+        backgroundColor: '#F5F7FA',
+        borderRadius: 10,
         overflow: 'hidden',
         marginVertical: 10,
-        alignSelf: 'center',
-        backgroundColor: '#fff',
+        elevation: 3,
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        elevation: 4,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
-    image: {
-        width: '100%',
+    imageSection: {
         height: 200,
-        resizeMode: 'cover',
+        width: width * 0.9,
+        objectFit: "cover",
     },
-    detailsContainer: {
-        padding: 16,
-        backgroundColor: '#f9f9f9',
-        borderBottomLeftRadius: 16,
-        borderBottomRightRadius: 16,
+    detailsSection: {
+        padding: 15,
+        backgroundColor: '#fff',
     },
     title: {
-        fontSize: 18,
-        fontWeight: '700',
-        marginBottom: 8,
-        color: '#162c63', // App's theme color
+        fontSize: width * 0.05, // Responsive font size
+        fontWeight: 'bold',
+        color: '#2E3A59',
     },
-    location: {
-        fontSize: 14,
-        color: '#888',
-        marginBottom: 8,
-    },
-    price: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#162c63',
-        marginBottom: 12,
-    },
-    ratingContainer: {
+    locationContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginVertical: 5,
     },
-    rating: {
-        fontSize: 14,
-        color: '#888',
-        marginLeft: 6,
+    locationText: {
+        fontSize: width * 0.035, // Responsive font size
+        color: '#7D8FAB',
+        marginLeft: 5,
     },
-    bookmarkContainer: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-        backgroundColor: '#fff',
-        borderRadius: 24,
-        padding: 8,
-        elevation: 4,
+    infoRow: {
+        flexDirection: 'row',
+        marginTop: 8,
+    },
+    infoItem: {
+        marginRight: 20,
+    },
+    infoLabel: {
+        fontSize: width * 0.03, // Responsive font size
+        color: '#7D8FAB',
+    },
+    infoValue: {
+        fontSize: width * 0.035, // Responsive font size
+        fontWeight: 'bold',
+        color: '#2E3A59',
+    },
+    sectionTitle: {
+        fontSize: width * 0.035, // Responsive font size
+        fontWeight: 'bold',
+        color: '#2E3A59',
+        marginTop: 10,
+    },
+    sectionsContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        marginVertical: 5,
+        gap: 8,
+    },
+    sectionItem: {
+        fontSize: width * 0.03, // Responsive font size
+        fontWeight: "bold",
+        backgroundColor: '#F9FAFB',
+        color: '#000',
+        borderColor: '#EAEAEA',
+        borderWidth: 2,
+        paddingVertical: 3,
+        paddingHorizontal: 6,
+        marginVertical: 2,
+        borderRadius: 8
+    },
+    divider: {
+        width: width * 0.8,
+        backgroundColor: "#EAEAEA",
+        marginTop: 10,
+        height: 2,
+        marginHorizontal: "auto"
+    },
+    button: {
+        flexDirection: 'row',
+        backgroundColor: '#6B48FF',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 10,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: width * 0.04, // Responsive font size
+        fontWeight: 'bold',
+    },
+    buttonIcon: {
+        marginLeft: 5,
     },
 });
+
+export default PropertyCard;
