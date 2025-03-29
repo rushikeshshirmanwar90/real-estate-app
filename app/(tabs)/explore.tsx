@@ -2,7 +2,7 @@ import { View, FlatList, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import PropertyCard, { ProjectData } from '@/components/project-card'
 import { getProject } from '@/func/project';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import Loading from '@/components/Loading';
 
 const Explore = () => {
@@ -62,6 +62,10 @@ const Explore = () => {
                 keyExtractor={item => item._id}
                 contentContainerStyle={styles.listContainer}
             />
+
+            <Link href={`/images`}>
+                upload
+            </Link>
 
         </View>
     );

@@ -83,7 +83,6 @@ const mockUserData = {
 
 
 export default function CustomerDetailsScreen() {
-
     const [customerDetails, setCustomerDetails] = useState<any>(null);
     const [userData, setUserData] = useState<any>(null);
     const [selectedProperty, setSelectedProperty] = useState<any>(null);

@@ -74,7 +74,6 @@ const ProjectDetailsScreen = ({ navigation }: ProjectDetailsScreenProps) => {
         return <Loading />
     }
 
-
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <ScrollView style={styles.container}>
@@ -164,7 +163,29 @@ const ProjectDetails = ({ project }: { project: Project }) => {
             </View>
 
             <View style={styles.descriptionContainer}>
-                <Text style={styles.descriptionTitle}>About This Project</Text>
+                <View style={{
+                    flexDirection: "row", justifyContent: "space-between", alignContent: "center", alignItems: "center"
+                }} >
+                    <Text style={styles.descriptionTitle}>About This Project</Text>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => {
+                            const obj = {
+                                sectionId: project._id,
+                                name: project.name,
+                                updateSectionType: "projects"
+                            }
+
+                            const data = JSON.stringify(obj);
+
+                            router.push({ pathname: '/updates/[data]', params: { data: data } })
+
+                        }}
+                    >
+                        <Ionicons name="eye-sharp" size={20} color="#6B48FF" />
+                        <Text style={styles.backButtonText}>Updates</Text>
+                    </TouchableOpacity>
+                </View>
                 <Text style={styles.descriptionText}>{project.description}</Text>
             </View>
 
@@ -255,7 +276,6 @@ const SectionsList = ({ sections, projectId, navigation }: { sections: Section[]
         <View style={styles.sectionsList}>
             {sections.map((section) => {
                 const colors = getColor(section.type);
-                console.log(section.type)
                 return (
                     <TouchableOpacity
                         key={section.sectionId || section._id}
