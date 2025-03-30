@@ -1,20 +1,17 @@
 {
-  "_id": "67dfdfe4232d33fa6475f536",
-  "flatId": "67d7532a18ae14c87a1cd929",
-  "flatName": "102",
-  "payments": [
-    { "date": "2025-03-23", "percentage": "10%", "title": "Booking Amount" }
+  "_id": "67e816bb86ad55515bf86f47",
+  "description": "Description",
+  "images": [
+    "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1743263427/kyewv06bmy4xxwcrutia.jpg"
   ],
-  "projectId": "67b396c1827b34ec3620ec88",
-  "projectName": "Kameshwari Heights",
-  "sectionId": "67d7532a18ae14c87a1cd926",
-  "sectionName": "Tower A",
-  "sectionType": "Buildings"
-}
-
-
-interface FlatProps {
-  _id : string,
-  flatId : string,
-  flatName : 
+  "reviews": [
+    {
+      "_id": "1743321473522",
+      "firstName": "Rushikesh",
+      "lastName": "Shrimanwar",
+      "review": "Rudhkk",
+      "userId": "67dfda4147fae5ccd5c0fde6"
+    }
+  ],
+  "title": "Titlr"
 }

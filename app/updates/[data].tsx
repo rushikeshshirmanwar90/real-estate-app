@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Modal, Image, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Modal, Image, ActivityIndicator, Dimensions, RefreshControlBase } from 'react-native';
 import { toast } from 'sonner-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -43,7 +43,7 @@ interface UploadedData {
 }
 
 interface UploadProgress {
-    [key: string]: number; // Uri as key, progress percentage as value
+    [key: string]: number;
 }
 
 const { width } = Dimensions.get('window');
@@ -71,12 +71,16 @@ export default function HomeScreen() {
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [projectName, setProjectName] = useState(info.name || 'Project');
     const [userData, setUserData] = useState<User | null>(null);
+    const [documentId, setDocumentId] = useState<string>('');
 
-    // New state for review functionality
+    // State for review functionality
     const [reviewText, setReviewText] = useState('');
     const [reviewModalVisible, setReviewModalVisible] = useState(false);
     const [selectedUpdateId, setSelectedUpdateId] = useState<string | null>(null);
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+    const [isEditingReview, setIsEditingReview] = useState(false);
+    const [currentReviewId, setCurrentReviewId] = useState<string | null>(null);
 
     useEffect(() => {
         getUserDetails(setUserData);
@@ -84,26 +88,45 @@ export default function HomeScreen() {
 
     // Fetch existing data
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await axios.get(`${domain}/api/review-and-update/update`);
-                const projectData = res.data.find((project: UploadedData) =>
-                    project.sectionId === info.sectionId
-                );
-
-                if (projectData) {
-                    setUploadedData(projectData.updates || []);
-                    setProjectName(projectData.name);
-                }
-                setIsDataLoaded(true);
-            } catch (error) {
-                console.error('Failed to fetch data', error);
-                setIsDataLoaded(true);
-            }
-        };
-
         fetchData();
     }, [info.sectionId]);
+
+    const fetchData = async () => {
+        try {
+            setIsDataLoaded(false);
+            const res = await axios.get(`${domain}/api/review-and-update/update`);
+            const projectData = res.data.find((project: UploadedData) =>
+                project.sectionId === info.sectionId
+            );
+
+            if (projectData) {
+                setDocumentId(projectData._id);
+                
+                // For each update, fetch its reviews
+                const updatesWithReviews = await Promise.all(projectData.updates.map(async (update: Update) => {
+                    try {
+                        const reviewsRes = await axios.get(
+                            `${domain}/api/review-and-update/review?documentId=${projectData._id}&updateId=${update._id}`
+                        );
+                        return {
+                            ...update,
+                            reviews: reviewsRes.data
+                        };
+                    } catch (error) {
+                        console.error(`Failed to fetch reviews for update ${update._id}`, error);
+                        return update;
+                    }
+                }));
+
+                setUploadedData(updatesWithReviews || []);
+                setProjectName(projectData.name);
+            }
+            setIsDataLoaded(true);
+        } catch (error) {
+            console.error('Failed to fetch data', error);
+            setIsDataLoaded(true);
+        }
+    };
 
     const uploadToCloudinary = async (imageUri: string) => {
         try {
@@ -194,28 +217,9 @@ export default function HomeScreen() {
 
             if (res.status === 200) {
                 toast.success('Successfully uploaded!');
-
-                // Add the new update to the list immediately for instant UI update
-                setUploadedData(prev => [
-                    ...prev,
-                    {
-                        _id: new Date().getTime().toString(), // Temporary ID until refresh
-                        images: successfulUploads,
-                        title,
-                        description,
-                        reviews: []
-                    }
-                ]);
-
+                
                 // Refresh data from server
-                const refreshRes = await axios.get(`${domain}/api/review-and-update/update`);
-                const projectData = refreshRes.data.find((project: UploadedData) =>
-                    project.sectionId === info.sectionId
-                );
-
-                if (projectData) {
-                    setUploadedData(projectData.updates || []);
-                }
+                fetchData();
             } else {
                 toast.error('Response was not successful');
             }
@@ -271,7 +275,7 @@ export default function HomeScreen() {
         }
     };
 
-    // Function to open review modal
+    // Function to open review modal for creating a new review
     const openReviewModal = (updateId: string) => {
         if (!userData) {
             toast.error('Please log in to add a review');
@@ -279,100 +283,155 @@ export default function HomeScreen() {
         }
         setSelectedUpdateId(updateId);
         setReviewText('');
+        setIsEditingReview(false);
+        setCurrentReviewId(null);
         setReviewModalVisible(true);
     };
 
-    // Function to submit a review
-    const submitReview = async () => {
-        if (!reviewText.trim()) {
-            toast.error('Please enter your review');
+    // Function to open review modal for editing an existing review
+    const editReview = async (updateId: string, reviewId: string, currentReview: string) => {
+        if (!userData) {
+            toast.error('Please log in to edit reviews');
             return;
         }
 
-        if (!userData || !selectedUpdateId) {
-            toast.error('Unable to submit review. Please try again.');
+        setSelectedUpdateId(updateId);
+        setReviewText(currentReview);
+        setIsEditingReview(true);
+        setCurrentReviewId(reviewId);
+        setReviewModalVisible(true);
+    };
+
+    // Function to submit a new review or update an existing one
+    const submitReview = async () => {
+        if (!reviewText.trim()) {
+            toast.error('Please enter your feedback');
+            return;
+        }
+
+        if (!userData || !selectedUpdateId || !documentId) {
+            toast.error('Unable to submit feedback. Please try again.');
             return;
         }
 
         setIsSubmittingReview(true);
 
         try {
-            // Get the project data to add the review to the correct update
-            const res = await axios.get(`${domain}/api/review-and-update/update`);
-            const projectData = res.data.find((project: UploadedData) =>
-                project.sectionId === info.sectionId
-            );
-
-            if (!projectData) {
-                throw new Error('Project data not found');
-            }
-
-            // Find the update to add the review to
-            const updateIndex: number = projectData.updates.findIndex((update: Update) => update._id === selectedUpdateId);
-
-            if (updateIndex === -1) {
-                throw new Error('Update not found');
-            }
-
-            // Create the review object
-            const newReview = {
+            const reviewData = {
                 userId: userData._id,
                 firstName: userData.firstName,
                 lastName: userData.lastName,
                 review: reviewText
             };
 
-            // Create a copy of the project data
-            const updatedProject = { ...projectData };
-
-            // Add the review to the specific update
-            if (!updatedProject.updates[updateIndex].reviews) {
-                updatedProject.updates[updateIndex].reviews = [];
-            }
-
-            updatedProject.updates[updateIndex].reviews?.push(newReview as Review);
-
-            // Send the updated project data to the server
-            const updateRes = await axios.put(
-                `${domain}/api/review-and-update/update/${projectData._id}`,
-                updatedProject
-            );
-
-            if (updateRes.status === 200) {
-                toast.success('Review submitted successfully!');
-
-                // Update the local state
-                const updatedData = [...uploadedData];
-                const updateToModify = updatedData.find(update => update._id === selectedUpdateId);
-
-                if (updateToModify) {
-                    if (!updateToModify.reviews) {
-                        updateToModify.reviews = [];
+            let response;
+            
+            if (isEditingReview && currentReviewId) {
+                // Update existing review
+                response = await axios.put(
+                    `${domain}/api/review-and-update/review?documentId=${documentId}&updateId=${selectedUpdateId}&reviewId=${currentReviewId}`,
+                    reviewData
+                );
+                
+                if (response.status === 200) {
+                    // Update the review in the UI
+                    const updatedData = [...uploadedData];
+                    const updateToModify = updatedData.find(update => update._id === selectedUpdateId);
+                    
+                    if (updateToModify && updateToModify.reviews) {
+                        const reviewIndex = updateToModify.reviews.findIndex(
+                            review => review._id === currentReviewId
+                        );
+                        
+                        if (reviewIndex !== -1) {
+                            updateToModify.reviews[reviewIndex] = {
+                                ...updateToModify.reviews[reviewIndex],
+                                review: reviewText
+                            };
+                            
+                            setUploadedData(updatedData);
+                            toast.success('Feedback updated successfully!');
+                        }
                     }
-
-                    updateToModify.reviews.push({
-                        _id: new Date().getTime().toString(),
-                        userId: userData._id,
-                        firstName: userData.firstName,
-                        lastName: userData.lastName,
-                        review: reviewText
-                    });
-
-                    setUploadedData(updatedData);
+                } else {
+                    toast.error('Failed to update feedback. Please try again.');
                 }
-
-                // Close the modal and reset form
-                setReviewModalVisible(false);
-                setReviewText('');
-                setSelectedUpdateId(null);
             } else {
-                toast.error('Failed to submit review');
+                // Create new review
+                response = await axios.post(
+                    `${domain}/api/review-and-update/review?documentId=${documentId}&updateId=${selectedUpdateId}`,
+                    reviewData
+                );
+
+                if (response.status === 201) {
+                    // Add the new review to the existing reviews in the UI
+                    const updatedData = [...uploadedData];
+                    const updateToModify = updatedData.find(update => update._id === selectedUpdateId);
+                    
+                    if (updateToModify) {
+                        if (!updateToModify.reviews) {
+                            updateToModify.reviews = [];
+                        }
+
+                        updateToModify.reviews.push(response.data.data);
+                        setUploadedData(updatedData);
+                        
+                        toast.success('Feedback added successfully!');
+                    }
+                } else {
+                    toast.error('Failed to add feedback. Please try again.');
+                }
             }
+
+            // Reset states and close modal
+            setReviewModalVisible(false);
+            setReviewText('');
+            setSelectedUpdateId(null);
+            setIsEditingReview(false);
+            setCurrentReviewId(null);
         } catch (error) {
-            console.error('Error submitting review:', error);
-            toast.error('Failed to submit review');
+            console.error('Error handling feedback:', error);
+            toast.error('Failed to process feedback');
         } finally {
             setIsSubmittingReview(false);
+        }
+    };
+
+    // Function to delete a review
+    const deleteReview = async (updateId: string, reviewId: string) => {
+        if (!userData) {
+            toast.error('Please log in to manage reviews');
+            return;
+        }
+
+        try {
+            setRefreshing(true);
+            // Call the review API to delete the review
+            const response = await axios.delete(
+                `${domain}/api/review-and-update/review?documentId=${documentId}&updateId=${updateId}&reviewId=${reviewId}`
+            );
+
+            if (response.status === 200) {
+                // Remove the deleted review from the UI
+                const updatedData = [...uploadedData];
+                const updateToModify = updatedData.find(update => update._id === updateId);
+                
+                if (updateToModify && updateToModify.reviews) {
+                    updateToModify.reviews = updateToModify.reviews.filter(
+                        review => review._id !== reviewId
+                    );
+                    setUploadedData(updatedData);
+                    
+                    toast.success('Feedback deleted successfully!');
+                }
+            } else {
+                toast.error('Failed to delete feedback');
+            }
+        } catch (error) {
+            console.error('Error deleting feedback:', error);
+            toast.error('Failed to delete feedback');
+        } finally {
+            setRefreshing(false);
         }
     };
 
@@ -388,7 +447,6 @@ export default function HomeScreen() {
     );
 
     const formatImageUrl = (url: string) => {
-        // If the URL is a relative path, prepend the domain
         if (url.startsWith('/')) {
             return `${domain}${url}`;
         }
@@ -433,9 +491,29 @@ export default function HomeScreen() {
                                                     <Text style={styles.reviewsTitle}>Feedback:</Text>
                                                     {update.reviews.map((review) => (
                                                         <View key={review._id} style={styles.review}>
-                                                            <Text style={styles.reviewAuthor}>
-                                                                {review.firstName} {review.lastName}:
-                                                            </Text>
+                                                            <View style={styles.reviewHeader}>
+                                                                <Text style={styles.reviewAuthor}>
+                                                                    {review.firstName} {review.lastName}:
+                                                                </Text>
+                                                                
+                                                                {/* Show edit/delete options if the review belongs to current user */}
+                                                                {userData && userData._id === review.userId && (
+                                                                    <View style={styles.reviewActions}>
+                                                                        <TouchableOpacity 
+                                                                            onPress={() => editReview(update._id, review._id, review.review)}
+                                                                            style={styles.reviewActionButton}
+                                                                        >
+                                                                            <MaterialIcons name="edit" size={16} color="#007AFF" />
+                                                                        </TouchableOpacity>
+                                                                        <TouchableOpacity 
+                                                                            onPress={() => deleteReview(update._id, review._id)}
+                                                                            style={styles.reviewActionButton}
+                                                                        >
+                                                                            <MaterialIcons name="delete" size={16} color="#FF3B30" />
+                                                                        </TouchableOpacity>
+                                                                    </View>
+                                                                )}
+                                                            </View>
                                                             <Text style={styles.reviewText}>{review.review}</Text>
                                                         </View>
                                                     ))}
@@ -604,12 +682,16 @@ export default function HomeScreen() {
                     onRequestClose={() => {
                         if (!isSubmittingReview) {
                             setReviewModalVisible(false);
+                            setIsEditingReview(false);
+                            setCurrentReviewId(null);
                         }
                     }}
                 >
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>Add Feedback</Text>
+                            <Text style={styles.modalTitle}>
+                                {isEditingReview ? 'Edit Feedback' : 'Add Feedback'}
+                            </Text>
 
                             <View style={styles.formContainer}>
                                 <Text style={styles.formLabel}>Your Feedback</Text>
@@ -634,6 +716,10 @@ export default function HomeScreen() {
                                     onPress={() => {
                                         if (!isSubmittingReview) {
                                             setReviewModalVisible(false);
+                                            setSelectedUpdateId(null);
+                                            setReviewText('');
+                                            setIsEditingReview(false);
+                                            setCurrentReviewId(null);
                                         }
                                     }}
                                     disabled={isSubmittingReview}
@@ -656,7 +742,9 @@ export default function HomeScreen() {
                                             <Text style={styles.submitButtonText}>Submitting...</Text>
                                         </View>
                                     ) : (
-                                        <Text style={styles.submitButtonText}>Submit Feedback</Text>
+                                        <Text style={styles.submitButtonText}>
+                                            {isEditingReview ? 'Update Feedback' : 'Submit Feedback'}
+                                        </Text>
                                     )}
                                 </TouchableOpacity>
                             </View>
@@ -667,7 +755,6 @@ export default function HomeScreen() {
         </SafeAreaView>
     );
 }
-
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
@@ -798,6 +885,12 @@ const styles = StyleSheet.create({
         borderLeftWidth: 2,
         borderLeftColor: '#007AFF',
     },
+    reviewHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
     reviewAuthor: {
         fontSize: 14,
         fontWeight: '500',
@@ -807,6 +900,14 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
         marginTop: 2,
+    },
+    reviewActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    reviewActionButton: {
+        padding: 4,
+        marginLeft: 8,
     },
     addReviewButton: {
         flexDirection: 'row',

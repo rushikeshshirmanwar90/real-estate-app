@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet } from 'react-native';
 import React, { useEffect } from 'react';
-import { icons } from '../constants/icons';
 import Animated, {
     interpolate,
     useAnimatedStyle,
@@ -15,6 +14,7 @@ interface TabBarButtonProps {
     routeName: string;
     color: string;
     label: string;
+    icon: (props: any) => JSX.Element;
 }
 
 const TabBarButton = ({
@@ -23,7 +23,8 @@ const TabBarButton = ({
     isFocused,
     routeName,
     color,
-    label
+    label,
+    icon
 }: TabBarButtonProps) => {
     const scale = useSharedValue(0);
 
@@ -51,13 +52,6 @@ const TabBarButton = ({
         };
     });
 
-    // Check if the icon exists for the current route
-    const IconComponent = icons[routeName];
-    if (!IconComponent) {
-        console.warn(`No icon found for route: ${routeName}`);
-        return null;
-    }
-
     return (
         <Pressable
             onPress={onPress}
@@ -65,7 +59,7 @@ const TabBarButton = ({
             style={styles.tabBarItem}
         >
             <Animated.View style={animatedIconStyle}>
-                {IconComponent({
+                {icon({
                     color: isFocused ? "#222" : "#222"
                 })}
             </Animated.View>

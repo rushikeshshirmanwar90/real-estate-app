@@ -62,11 +62,6 @@ const Explore = () => {
                 keyExtractor={item => item._id}
                 contentContainerStyle={styles.listContainer}
             />
-
-            <Link href={`/images`}>
-                upload
-            </Link>
-
         </View>
     );
 };

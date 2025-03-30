@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { CustomerDetails, Payment, Property, User, User2 } from '@/types/user'; // Adjust path as needed
+import { CustomerDetails, Payment, Property, User} from '@/types/user'; // Adjust path as needed
 import { getUserDetails } from '@/lib/user'; // Adjust path as needed
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,7 +12,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera'; // Updated impor
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { domain } from '@/lib/domain';
-import { addProperty, getProperties } from '@/func/property';
+import { addProperty } from '@/func/property';
 import { Building, FlatInfo, Project, PropertyItem, ScannedData, SectionData } from '@/types/types';
 
 const { width } = Dimensions.get('window');
@@ -299,16 +299,27 @@ const UserProfile = () => {
             </View>
 
             {/* QR Code Buttons */}
-            <View style={styles.qrButtonsContainer}>
-                <TouchableOpacity style={styles.qrButton} onPress={() => setShowQR(true)}>
-                    <MaterialCommunityIcons name="qrcode" size={scaleFont(20)} color="#000" style={styles.sectionIcon} />
-                    <Text style={styles.qrText}>Show QR Code</Text>
-                </TouchableOpacity>
 
-                <TouchableOpacity style={styles.qrButton} onPress={handleRequestCameraPermission}>
-                    <MaterialCommunityIcons name="qrcode-scan" size={scaleFont(20)} color="#000" style={styles.sectionIcon} />
-                    <Text style={styles.qrText}>Scan QR Code</Text>
-                </TouchableOpacity>
+
+            <View style={styles.qrButtonsContainer}>
+
+
+                {
+                    userData.userType === "customer" ? (
+                        <TouchableOpacity style={styles.qrButton} onPress={() => setShowQR(true)}>
+                            <MaterialCommunityIcons name="qrcode" size={scaleFont(20)} color="#000" style={styles.sectionIcon} />
+                            <Text style={styles.qrText}>Show QR Code</Text>
+                        </TouchableOpacity>
+                    ) :  (
+                        <TouchableOpacity style={styles.qrButton} onPress={handleRequestCameraPermission}>
+                            <MaterialCommunityIcons name="qrcode-scan" size={scaleFont(20)} color="#000" style={styles.sectionIcon} />
+                            <Text style={styles.qrText}>Scan QR Code</Text>
+                        </TouchableOpacity>
+                    )
+                }
+
+
+
             </View>
 
 
@@ -500,7 +511,7 @@ const UserProfile = () => {
                                 style={styles.textInput}
                                 placeholder={selectedSectionType === "Buildings" ? "e.g., 101" : "e.g., RH-5"}
                                 value={flatName}
-                                onChangeText={setFlatNumber}
+                                onChangeText={setFlatName}
                             />
                         </View>
 
