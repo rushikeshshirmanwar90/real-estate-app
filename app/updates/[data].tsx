@@ -8,6 +8,15 @@ import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import { domain } from '@/lib/domain';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+interface User {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    userType: string;
+}
 
 interface Review {
     userId: string;
@@ -39,6 +48,13 @@ interface UploadProgress {
 
 const { width } = Dimensions.get('window');
 
+const getUserDetails = async (setUserData: any) => {
+    const userDetails = (await AsyncStorage.getItem("user")) || "";
+    const data = JSON.parse(userDetails);
+    console.log(data);
+    setUserData(data);
+};
+
 export default function HomeScreen() {
     const { data } = useLocalSearchParams();
     const info = JSON.parse(String(data));
@@ -54,6 +70,17 @@ export default function HomeScreen() {
     const [uploadProgress, setUploadProgress] = useState<UploadProgress>({});
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [projectName, setProjectName] = useState(info.name || 'Project');
+    const [userData, setUserData] = useState<User | null>(null);
+
+    // New state for review functionality
+    const [reviewText, setReviewText] = useState('');
+    const [reviewModalVisible, setReviewModalVisible] = useState(false);
+    const [selectedUpdateId, setSelectedUpdateId] = useState<string | null>(null);
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+    useEffect(() => {
+        getUserDetails(setUserData);
+    }, []);
 
     // Fetch existing data
     useEffect(() => {
@@ -244,6 +271,111 @@ export default function HomeScreen() {
         }
     };
 
+    // Function to open review modal
+    const openReviewModal = (updateId: string) => {
+        if (!userData) {
+            toast.error('Please log in to add a review');
+            return;
+        }
+        setSelectedUpdateId(updateId);
+        setReviewText('');
+        setReviewModalVisible(true);
+    };
+
+    // Function to submit a review
+    const submitReview = async () => {
+        if (!reviewText.trim()) {
+            toast.error('Please enter your review');
+            return;
+        }
+
+        if (!userData || !selectedUpdateId) {
+            toast.error('Unable to submit review. Please try again.');
+            return;
+        }
+
+        setIsSubmittingReview(true);
+
+        try {
+            // Get the project data to add the review to the correct update
+            const res = await axios.get(`${domain}/api/review-and-update/update`);
+            const projectData = res.data.find((project: UploadedData) =>
+                project.sectionId === info.sectionId
+            );
+
+            if (!projectData) {
+                throw new Error('Project data not found');
+            }
+
+            // Find the update to add the review to
+            const updateIndex: number = projectData.updates.findIndex((update: Update) => update._id === selectedUpdateId);
+
+            if (updateIndex === -1) {
+                throw new Error('Update not found');
+            }
+
+            // Create the review object
+            const newReview = {
+                userId: userData._id,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                review: reviewText
+            };
+
+            // Create a copy of the project data
+            const updatedProject = { ...projectData };
+
+            // Add the review to the specific update
+            if (!updatedProject.updates[updateIndex].reviews) {
+                updatedProject.updates[updateIndex].reviews = [];
+            }
+
+            updatedProject.updates[updateIndex].reviews?.push(newReview as Review);
+
+            // Send the updated project data to the server
+            const updateRes = await axios.put(
+                `${domain}/api/review-and-update/update/${projectData._id}`,
+                updatedProject
+            );
+
+            if (updateRes.status === 200) {
+                toast.success('Review submitted successfully!');
+
+                // Update the local state
+                const updatedData = [...uploadedData];
+                const updateToModify = updatedData.find(update => update._id === selectedUpdateId);
+
+                if (updateToModify) {
+                    if (!updateToModify.reviews) {
+                        updateToModify.reviews = [];
+                    }
+
+                    updateToModify.reviews.push({
+                        _id: new Date().getTime().toString(),
+                        userId: userData._id,
+                        firstName: userData.firstName,
+                        lastName: userData.lastName,
+                        review: reviewText
+                    });
+
+                    setUploadedData(updatedData);
+                }
+
+                // Close the modal and reset form
+                setReviewModalVisible(false);
+                setReviewText('');
+                setSelectedUpdateId(null);
+            } else {
+                toast.error('Failed to submit review');
+            }
+        } catch (error) {
+            console.error('Error submitting review:', error);
+            toast.error('Failed to submit review');
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
+
     const EmptyState = () => (
         <View style={styles.emptyStateContainer}>
             <MaterialIcons name="photo-library" size={80} color="#ccc" />
@@ -309,6 +441,15 @@ export default function HomeScreen() {
                                                     ))}
                                                 </View>
                                             )}
+
+                                            {/* Add Review Button */}
+                                            <TouchableOpacity
+                                                style={styles.addReviewButton}
+                                                onPress={() => openReviewModal(update._id)}
+                                            >
+                                                <MaterialIcons name="rate-review" size={16} color="#007AFF" />
+                                                <Text style={styles.addReviewText}>Add Feedback</Text>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
                                 ))}
@@ -340,6 +481,7 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 </View>
 
+                {/* Update Modal */}
                 <Modal
                     visible={isModalVisible}
                     transparent
@@ -447,6 +589,74 @@ export default function HomeScreen() {
                                         </View>
                                     ) : (
                                         <Text style={styles.submitButtonText}>Submit</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Review Modal */}
+                <Modal
+                    visible={reviewModalVisible}
+                    transparent
+                    animationType="slide"
+                    onRequestClose={() => {
+                        if (!isSubmittingReview) {
+                            setReviewModalVisible(false);
+                        }
+                    }}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Add Feedback</Text>
+
+                            <View style={styles.formContainer}>
+                                <Text style={styles.formLabel}>Your Feedback</Text>
+                                <TextInput
+                                    style={[styles.input, styles.textArea]}
+                                    value={reviewText}
+                                    onChangeText={setReviewText}
+                                    placeholder="Share your thoughts about this update..."
+                                    multiline
+                                    numberOfLines={4}
+                                    editable={!isSubmittingReview}
+                                />
+                            </View>
+
+                            <View style={styles.modalButtons}>
+                                <TouchableOpacity
+                                    style={[
+                                        styles.modalButton,
+                                        styles.cancelButton,
+                                        isSubmittingReview && styles.disabledButton
+                                    ]}
+                                    onPress={() => {
+                                        if (!isSubmittingReview) {
+                                            setReviewModalVisible(false);
+                                        }
+                                    }}
+                                    disabled={isSubmittingReview}
+                                >
+                                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={[
+                                        styles.modalButton,
+                                        styles.submitButton,
+                                        isSubmittingReview && styles.disabledButton
+                                    ]}
+                                    onPress={submitReview}
+                                    disabled={isSubmittingReview}
+                                >
+                                    {isSubmittingReview ? (
+                                        <View style={styles.buttonLoadingContainer}>
+                                            <ActivityIndicator size="small" color="white" />
+                                            <Text style={styles.submitButtonText}>Submitting...</Text>
+                                        </View>
+                                    ) : (
+                                        <Text style={styles.submitButtonText}>Submit Feedback</Text>
                                     )}
                                 </TouchableOpacity>
                             </View>
@@ -597,6 +807,23 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
         marginTop: 2,
+    },
+    addReviewButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 12,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderWidth: 1,
+        borderColor: '#007AFF',
+        borderRadius: 20,
+        alignSelf: 'flex-start',
+    },
+    addReviewText: {
+        color: '#007AFF',
+        marginLeft: 6,
+        fontSize: 14,
+        fontWeight: '500',
     },
     modalContainer: {
         flex: 1,
