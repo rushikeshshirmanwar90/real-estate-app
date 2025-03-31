@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { CustomerDetails, Payment, Property, User} from '@/types/user'; // Adjust path as needed
+import { CustomerDetails, Payment, Property, User } from '@/types/user'; // Adjust path as needed
 import { getUserDetails } from '@/lib/user'; // Adjust path as needed
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,10 +14,10 @@ import axios from 'axios';
 import { domain } from '@/lib/domain';
 import { addProperty } from '@/func/property';
 import { Building, FlatInfo, Project, PropertyItem, ScannedData, SectionData } from '@/types/types';
+import RefreshButton from '@/components/Refersh';
 
 const { width } = Dimensions.get('window');
 const scaleFont = (size: number) => (width / 375) * size;
-
 
 const UserProfile = () => {
     const router = useRouter();
@@ -42,11 +42,17 @@ const UserProfile = () => {
     const [flatNumber, setFlatNumber] = useState<string>("");
     const [filteredSections, setFilteredSections] = useState<SectionData[]>([]);
     const [availableFlats, setAvailableFlats] = useState<FlatInfo[]>([]);
-
+    const [refershNum, setRefershNum] = useState<number>(0);
 
     useEffect(() => {
         getUserDetails(setUserData);
     }, []);
+
+
+    const referesh = () => {
+        setRefershNum(refershNum + 1);
+    }
+
 
     useEffect(() => {
         const fetchPropertyData = async () => {
@@ -65,7 +71,7 @@ const UserProfile = () => {
 
         }
         fetchPropertyData();
-    }, [userData])
+    }, [userData, refershNum])
 
 
     const handleRequestCameraPermission = async (): Promise<void> => {
@@ -236,13 +242,10 @@ const UserProfile = () => {
         }
     }, [selectedSection, selectedSectionType, building]);
 
-
-
     const handleLogout = async () => {
         await AsyncStorage.setItem('user', '');
-        router.push({ pathname: '/registration' });
+        router.push({ pathname: '/login' });
     };
-
 
     if (!userData) {
         return (
@@ -298,31 +301,27 @@ const UserProfile = () => {
                 </View>
             </View>
 
+
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <RefreshButton onRefresh={referesh} />
+            </View>
+
             {/* QR Code Buttons */}
-
-
             <View style={styles.qrButtonsContainer}>
-
-
                 {
                     userData.userType === "customer" ? (
                         <TouchableOpacity style={styles.qrButton} onPress={() => setShowQR(true)}>
                             <MaterialCommunityIcons name="qrcode" size={scaleFont(20)} color="#000" style={styles.sectionIcon} />
                             <Text style={styles.qrText}>Show QR Code</Text>
                         </TouchableOpacity>
-                    ) :  (
+                    ) : (
                         <TouchableOpacity style={styles.qrButton} onPress={handleRequestCameraPermission}>
                             <MaterialCommunityIcons name="qrcode-scan" size={scaleFont(20)} color="#000" style={styles.sectionIcon} />
                             <Text style={styles.qrText}>Scan QR Code</Text>
                         </TouchableOpacity>
                     )
                 }
-
-
-
             </View>
-
-
 
             {properties ? (
                 <View style={styles.propertiesContainer}>

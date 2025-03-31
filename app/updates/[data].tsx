@@ -58,7 +58,6 @@ const getUserDetails = async (setUserData: any) => {
 export default function HomeScreen() {
     const { data } = useLocalSearchParams();
     const info = JSON.parse(String(data));
-
     const [images, setImages] = useState<string[]>([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [title, setTitle] = useState('');
@@ -91,6 +90,7 @@ export default function HomeScreen() {
         fetchData();
     }, [info.sectionId]);
 
+    // Fetching the Update Data
     const fetchData = async () => {
         try {
             setIsDataLoaded(false);
@@ -128,6 +128,7 @@ export default function HomeScreen() {
         }
     };
 
+    // upload images to Cloudinary
     const uploadToCloudinary = async (imageUri: string) => {
         try {
             const response = await fetch(imageUri);
@@ -457,7 +458,6 @@ export default function HomeScreen() {
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>
                 <Text style={styles.projectTitle}>{projectName}</Text>
-
                 {isDataLoaded ? (
                     <>
                         {uploadedData.length > 0 ? (
@@ -543,21 +543,24 @@ export default function HomeScreen() {
                     </View>
                 )}
 
-                <View style={styles.buttonsContainer}>
-                    <TouchableOpacity
-                        style={styles.floatingButton}
-                        onPress={openCamera}
-                    >
-                        <MaterialIcons name="add-a-photo" size={28} color="white" />
-                    </TouchableOpacity>
+                {
+                    userData?.userType == 'staff' ? (<View style={styles.buttonsContainer}>
 
-                    <TouchableOpacity
-                        style={[styles.floatingButton, styles.galleryButton]}
-                        onPress={openGallery}
-                    >
-                        <MaterialIcons name="photo-library" size={28} color="white" />
-                    </TouchableOpacity>
-                </View>
+                        <TouchableOpacity
+                            style={styles.floatingButton}
+                            onPress={openCamera}
+                        >
+                            <MaterialIcons name="add-a-photo" size={28} color="white" />
+                        </TouchableOpacity>
+    
+                        <TouchableOpacity
+                            style={[styles.floatingButton, styles.galleryButton]}
+                            onPress={openGallery}
+                        >
+                            <MaterialIcons name="photo-library" size={28} color="white" />
+                        </TouchableOpacity>
+                    </View>) : <></>
+                }
 
                 {/* Update Modal */}
                 <Modal
@@ -755,6 +758,7 @@ export default function HomeScreen() {
         </SafeAreaView>
     );
 }
+
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,

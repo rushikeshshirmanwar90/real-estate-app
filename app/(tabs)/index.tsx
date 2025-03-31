@@ -115,8 +115,6 @@ const IndexScreen = () => {
         }
     };
 
-
-
     const reloadData = () => {
         setLoading(true);
         const tmp = Math.floor(Math.random() * 10000);

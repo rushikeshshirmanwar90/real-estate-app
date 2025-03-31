@@ -2,11 +2,10 @@ import { View, FlatList, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import PropertyCard, { ProjectData } from '@/components/project-card'
 import { getProject } from '@/func/project';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import Loading from '@/components/Loading';
 
 const Explore = () => {
-
     const router = useRouter();
 
     const [projects, setProjects] = useState<ProjectData[]>([]);
