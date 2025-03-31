@@ -301,11 +301,6 @@ const UserProfile = () => {
                 </View>
             </View>
 
-
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <RefreshButton onRefresh={referesh} />
-            </View>
-
             {/* QR Code Buttons */}
             <View style={styles.qrButtonsContainer}>
                 {
@@ -322,6 +317,12 @@ const UserProfile = () => {
                     )
                 }
             </View>
+
+            
+            <View style={{ marginBottom: scaleFont(10), width : scaleFont(130), alignSelf : "flex-end" }}>
+                <RefreshButton onRefresh={referesh} />
+            </View>
+
 
             {properties ? (
                 <View style={styles.propertiesContainer}>
@@ -715,7 +716,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         padding: scaleFont(12),
         borderRadius: scaleFont(10),
-        marginBottom: scaleFont(10),
+        marginBottom: scaleFont(0),
     },
     qrText: {
         fontSize: scaleFont(14),
