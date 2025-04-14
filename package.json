@@ -57,7 +57,8 @@
     "react-native-swiper-flatlist": "^3.2.5",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10",
-    "sonner-native": "^0.17.0"
+    "sonner-native": "^0.17.0",
+    "expo-notifications": "~0.29.14"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -11,6 +11,9 @@ interface PropertyCardProps {
 const { width } = Dimensions.get('window');
 
 export default function PropertyCard({ property }: PropertyCardProps) {
+
+    console.log(property);
+
     const router = useRouter();
 
     return (

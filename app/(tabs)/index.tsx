@@ -52,9 +52,6 @@ const IndexScreen = () => {
         }
     }, [userData, reload, contactsUploaded]);
 
-
-
-
     const getPermissionAndAddContacts = async (userId: string) => {
         try {
             // Check if we've already uploaded contacts for this user
