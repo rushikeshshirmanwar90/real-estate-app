@@ -4,6 +4,7 @@ export interface Amenity {
 }
 
 export interface RowHouseProps {
+  _id: string;
   name: string;
   description?: string;
   projectId: string;

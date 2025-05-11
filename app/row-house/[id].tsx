@@ -21,9 +21,7 @@ const RowHouse = () => {
 
     const fetchRowHouseData = async () => {
         try {
-
             console.log(String(id));
-
             const res = await getSingleRowHouse(String(id));
             setRowHouse(res);
         } catch (error) {

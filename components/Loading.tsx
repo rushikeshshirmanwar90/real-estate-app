@@ -1,21 +1,20 @@
-import { ActivityIndicator, StyleSheet } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import React from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
-const Loading = () => {
+const Loading: React.FC = () => {
     return (
-        <SafeAreaView style={styles.loadingContainer}>
+        <View style={styles.container}>
             <ActivityIndicator size="large" color="#6B48FF" />
-        </SafeAreaView>
-    )
-}
-
-export default Loading
+        </View>
+    );
+};
 
 const styles = StyleSheet.create({
-    loadingContainer: {
+    container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-})
+});
+
+export default Loading;

@@ -138,4 +138,16 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#B45309",
   },
+
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: scaleFont(16), // Responsive padding
+  },
+  backButtonText: {
+    marginLeft: scaleFont(8),
+    fontSize: scaleFont(16), // Responsive font size
+    color: "#92400E",
+    fontWeight: "500",
+  },
 });

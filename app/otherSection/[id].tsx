@@ -7,6 +7,7 @@ import { getSectionData } from '@/func/project';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export interface OtherSectionProps {
+    _id: string
     name: string;
     description?: string;
     projectId: string;
@@ -129,7 +130,26 @@ const OtherSection = () => {
                     </View>
 
                     <View style={styles.descriptionContainer}>
-                        <Text style={styles.sectionTitle}>About These Row Houses</Text>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                            <Text style={styles.sectionTitle}>About Row Houses</Text>
+                            <TouchableOpacity
+                                style={styles.backButton}
+                                onPress={() => {
+                                    const obj = {
+                                        sectionId: sectionDetails._id,
+                                        name: sectionDetails.name,
+                                        updateSectionType: 'other',
+                                        backgroundColor: "#E8F5E9",
+                                        textColor: "#43A047",
+                                    };
+                                    const data = JSON.stringify(obj);
+                                    router.push({ pathname: '/updates/[data]', params: { data } });
+                                }}
+                            >
+                                <Ionicons name="eye-sharp" size={20} color="#43A047" />
+                                <Text style={styles.backButtonText}>Updates</Text>
+                            </TouchableOpacity>
+                        </View>
                         <Text style={styles.description}>{sectionDetails.description}</Text>
                     </View>
 
@@ -151,6 +171,7 @@ const OtherSection = () => {
 }
 
 export default OtherSection
+
 const styles = StyleSheet.create({
     backButtonContainer: {
         paddingHorizontal: scaleFont(16),

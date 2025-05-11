@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { Building } from '@/types/building';
 import Swiper from 'react-native-swiper';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width: screenWidth, height } = Dimensions.get('window');
-const scaleFont = (size: any) => (screenWidth / 375) * size; // 375 is a standard base width (iPhone 6/7/8)
+const scaleFont = (size: any) => (screenWidth / 375) * size;
 
 export const BuildingDetails: React.FC<{ building: Building | undefined }> = ({ building }) => {
     if (!building) {
@@ -37,7 +39,26 @@ export const BuildingDetails: React.FC<{ building: Building | undefined }> = ({ 
             </View>
 
             <View style={styles.detailsContainer}>
-                <Text style={styles.buildingName}>{building.name}</Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Text style={styles.buildingName}>{building.name}</Text>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => {
+                            const obj = {
+                                sectionId: building._id,
+                                name: building.name,
+                                updateSectionType: 'buildings',
+                                backgroundColor: "#EBF5FF",
+                                textColor: "#1E88E5",
+                            };
+                            const data = JSON.stringify(obj);
+                            router.push({ pathname: '/updates/[data]', params: { data } });
+                        }}
+                    >
+                        <Ionicons name="eye-sharp" size={20} color="#1E88E5" />
+                        <Text style={styles.backButtonText}>Updates</Text>
+                    </TouchableOpacity>
+                </View>
 
                 <View style={styles.locationContainer}>
                     <MapPin size={scaleFont(18)} color="#1E88E5" />
@@ -191,4 +212,17 @@ export const styles = StyleSheet.create({
         lineHeight: scaleFont(18), // Reduced from 20
         color: '#64748b', // gray
     },
+
+    backButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        padding: scaleFont(16), // Responsive padding
+    },
+    backButtonText: {
+        marginLeft: scaleFont(8),
+        fontSize: scaleFont(16), // Responsive font size
+        color: "#1E88E5",
+        fontWeight: "500",
+    },
+
 });

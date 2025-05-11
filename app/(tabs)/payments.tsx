@@ -88,7 +88,6 @@ export default function CustomerManagement(): JSX.Element {
         <TouchableOpacity
             style={styles.customerItem}
             onPress={() => router.push({ pathname: '/customer-details/[id]', params: { id: String(item._id) } })}
-        // onPress={() => router.push({ pathname: '/customer-details' })}
         >
             <View style={styles.customerContent}>
                 <View style={styles.avatarContainer}>
@@ -103,7 +102,7 @@ export default function CustomerManagement(): JSX.Element {
             </View>
             <TouchableOpacity
                 style={styles.viewButton}
-                onPress={() => router.push(`/customer-details`)}
+                onPress={() => router.push({ pathname: '/customer-details/[id]', params: { id: String(item._id) } })}
             >
                 <Text style={styles.viewButtonText}>View</Text>
             </TouchableOpacity>

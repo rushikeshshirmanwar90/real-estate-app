@@ -9,7 +9,7 @@ import Swiper from '@/components/Swiper';
 
 // Get screen dimensions for responsive scaling
 const { width } = Dimensions.get('window');
-const scaleFont = (size) => (width / 375) * size;
+const scaleFont = (size: number) => (width / 375) * size;
 
 export default function RoomDetailScreen() {
     const router = useRouter();

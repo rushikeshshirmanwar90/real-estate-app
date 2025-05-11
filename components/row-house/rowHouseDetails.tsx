@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, Image, Dimensions } from 'react-native';
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { MaterialCommunityIcons, Feather, Ionicons } from '@expo/vector-icons';
 import * as Progress from 'react-native-progress';
 import { RowHouseProps } from '@/types/rowHouse';
 import { styles } from '@/style/row-house/rowHouseDetails';
 import Swiper from 'react-native-swiper';
+import { router } from 'expo-router';
 
 export function RowHouseDetails({ rowHouse }: { rowHouse: RowHouseProps }) {
     const availableHouses = rowHouse.totalHouse - rowHouse.bookedHouse;
@@ -42,10 +43,36 @@ export function RowHouseDetails({ rowHouse }: { rowHouse: RowHouseProps }) {
                 </Swiper>
             </View>
 
-            <View style={styles.descriptionContainer}>
-                <Text style={styles.sectionTitle}>About These Row Houses</Text>
-                <Text style={styles.description}>{rowHouse.description}</Text>
+
+            <View>
+                <View style={styles.descriptionContainer}>
+
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                        <Text style={styles.sectionTitle}>About Row Houses</Text>
+
+                        <TouchableOpacity
+                            style={styles.backButton}
+                            onPress={() => {
+                                const obj = {
+                                    sectionId: rowHouse._id,
+                                    name: rowHouse.name,
+                                    updateSectionType: 'row-house',
+                                    backgroundColor: "#FFF7ED",
+                                    textColor: "#92400E",
+                                };
+                                const data = JSON.stringify(obj);
+                                router.push({ pathname: '/updates/[data]', params: { data } });
+                            }}
+                        >
+                            <Ionicons name="eye-sharp" size={20} color="#92400E" />
+                            <Text style={styles.backButtonText}>Updates</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <Text style={styles.description}>{rowHouse.description}</Text>
+                </View>
             </View>
+
 
             <View style={styles.availabilityContainer}>
                 <View style={styles.availabilityHeader}>

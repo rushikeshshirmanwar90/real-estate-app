@@ -27,8 +27,6 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack screenOptions={{ headerShown: false }}>
-        {/* <Stack.Screen name="login" /> */}
-        {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
       </Stack>
       <Toaster position="bottom-center" />
     </GestureHandlerRootView>

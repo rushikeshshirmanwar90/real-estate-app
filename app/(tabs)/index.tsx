@@ -11,9 +11,10 @@ import { getFlatData } from '@/func/flat-data';
 import { getUserDetails } from '@/lib/user';
 import Loading from '@/components/Loading';
 import { addContacts } from '@/func/contact';
-import * as Contacts from 'expo-contacts';
 import { clientId } from '@/lib/client';
 import { getContact } from '@/lib/function/get-contact';
+import ReferralModal, { ReferenceData } from '@/components/reference-model/ReferenceModel';
+import { addReference } from '@/func/reference';
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +24,7 @@ const IndexScreen = () => {
     const [propertyData, setPropertyData] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
     const [contactsUploaded, setContactsUploaded] = useState(false);
+    const [modalVisible, setModalVisible] = useState(true);
 
     useEffect(() => {
         getUserDetails(setUserData)
@@ -30,7 +32,6 @@ const IndexScreen = () => {
 
     const fetchFlatData = async () => {
         try {
-            console.log(userData);
             if (userData?._id) {
                 const res = await getFlatData(userData._id);
                 setPropertyData(res ?? []);
@@ -126,10 +127,27 @@ const IndexScreen = () => {
         <PropertyCard property={item} />
     );
 
+    const handleSubmit = async (payload: ReferenceData) => {
+        try {
+            await addReference(payload);
+            setModalVisible(false);
+            Alert.alert("Success", "Reference submitted successfully!");
+        } catch (error: any) {
+            console.error("Error submitting reference:", error.message);
+        }
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar style="light" />
             <Header name={userData?.firstName} />
+
+
+            <ReferralModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                onSubmit={handleSubmit}
+            />
 
             {propertyData && propertyData.length > 0 ? (
                 <FlatList
