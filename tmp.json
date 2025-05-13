@@ -1,17 +1,11 @@
 {
-  "_id": "67e816bb86ad55515bf86f47",
-  "description": "Description",
-  "images": [
-    "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1743263427/kyewv06bmy4xxwcrutia.jpg"
+  "leads": [
+    { "contactNumber": "957-989-6842", "name": "Rushikes Shrimanwar" },
+    { "contactNumber": "957-989-6842", "name": "Chinmay Shrimanwar" }
   ],
-  "reviews": [
-    {
-      "_id": "1743321473522",
-      "firstName": "Rushikesh",
-      "lastName": "Shrimanwar",
-      "review": "Rudhkk",
-      "userId": "67dfda4147fae5ccd5c0fde6"
-    }
-  ],
-  "title": "Titlr"
+  "referenceCustomer": {
+    "contactNumber": "9579896842",
+    "id": "67dfda4147fae5ccd5c0fde6",
+    "name": "Rushikesh Shrimanwar"
+  }
 }

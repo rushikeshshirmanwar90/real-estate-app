@@ -21,7 +21,7 @@ import { getLeads } from '@/func/reference';
 
 // Define types
 interface Lead {
-    _id: string;
+    _id?: string;
     name: string;
     contactNumber: string;
 }
@@ -50,7 +50,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ visible, onClose, onSubmi
     const [isKeyboardVisible, setKeyboardVisible] = useState<boolean>(false);
     const [userData, setUserData] = useState<User | undefined>(undefined);
     const [editingLead, setEditingLead] = useState<Lead | null>(null);
-    const [leadEditId, setLeadEditId] = useState<string>("");
+    const [leadEditId, setLeadEditId] = useState<string | undefined>("");
 
     const slideAnim = useRef<Animated.Value>(new Animated.Value(0)).current;
     const fadeAnim = useRef<Animated.Value>(new Animated.Value(0)).current;
@@ -160,7 +160,6 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ visible, onClose, onSubmi
         } else {
             // Add new lead
             const newLead: Lead = {
-                _id: "10",
                 name: leadName.trim(),
                 contactNumber: leadContact.trim()
             };
@@ -172,29 +171,57 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ visible, onClose, onSubmi
         setLeadContact('');
     };
 
-
     const handleEditLead = (lead: Lead): void => {
         console.log("Edit clicked for lead:", lead);
         setEditingLead(lead);
         setLeadName(lead.name);
         setLeadContact(lead.contactNumber);
+        setLeadEditId(lead._id);
     };
 
     const handleUpdateLead = () => {
+        if (!leadName.trim() || !leadContact.trim()) {
+            return Alert.alert("Validation Error", "Please enter both lead name and contact number");
+        }
 
-        console.log("====================");
-        console.log("Lead Name : ", leadName);
-        console.log("Lead Contact Number : ", leadContact);
-        console.log("Lead id : ", leadEditId);
-    }
+        // Simple phone validation
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(leadContact.replace(/[^0-9]/g, ''))) {
+            return Alert.alert("Invalid Contact", "Please enter a valid 10-digit phone number");
+        }
+
+        // Update the lead in the leads array
+        const updatedLeads = leads.map(lead =>
+            lead._id === leadEditId
+                ? { ...lead, name: leadName.trim(), contactNumber: leadContact.trim() }
+                : lead
+        );
+
+        setLeads(updatedLeads);
+        setEditingLead(null);
+        setLeadName('');
+        setLeadContact('');
+        setLeadEditId("");
+
+        console.log("Lead updated:", {
+            id: leadEditId,
+            name: leadName,
+            contactNumber: leadContact
+        });
+    };
 
     const cancelEditing = (): void => {
         setEditingLead(null);
         setLeadName('');
         setLeadContact('');
+        setLeadEditId("");
     };
 
     const handleSubmit = (): void => {
+        if (leads.length === 0) {
+            return Alert.alert("No Leads", "Please add at least one lead before submitting");
+        }
+
         const referenceData: ReferenceData = {
             referenceCustomer: {
                 id: userData?._id || "",
@@ -204,6 +231,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ visible, onClose, onSubmi
             leads: leads
         };
 
+        console.log("Submitting reference data:", referenceData);
         onSubmit(referenceData);
         onClose();
     };
@@ -246,7 +274,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ visible, onClose, onSubmi
                         <View style={styles.descriptionContainer}>
                             <Ionicons name="gift" size={24} color="#FF6B6B" style={styles.giftIcon} />
                             <Text style={styles.modalDescription}>
-                                Give us at least 4 closed leads to get the 50,000 prize money or rewards
+                                Give us at least 5 leads to get the prize money upto 50,000
                             </Text>
                         </View>
 
@@ -269,10 +297,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ visible, onClose, onSubmi
                                                 <Text style={styles.leadContact}>{lead.contactNumber}</Text>
                                             </View>
                                         </View>
-                                        <TouchableOpacity onPress={() => {
-                                            handleEditLead(lead)
-                                            setLeadEditId(lead._id)
-                                        }}>
+                                        <TouchableOpacity onPress={() => handleEditLead(lead)}>
                                             <FontAwesome name="edit" size={18} color="#4C9FD8" />
                                         </TouchableOpacity>
                                     </View>
@@ -322,7 +347,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ visible, onClose, onSubmi
                                         styles.button,
                                         styles.addButton
                                     ]}
-                                    onPress={() => (editingLead ? handleUpdateLead() : handleAddLead())}
+                                    onPress={editingLead ? handleUpdateLead : handleAddLead}
                                 >
                                     <Ionicons
                                         name={editingLead ? "save" : "add-circle"}
@@ -336,6 +361,15 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ visible, onClose, onSubmi
                             </View>
                         </View>
                     </ScrollView>
+
+                    {/* New Done Button */}
+                    <TouchableOpacity
+                        style={styles.doneButton}
+                        onPress={handleSubmit}
+                    >
+                        <Text style={styles.doneButtonText}>Done</Text>
+                        <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                    </TouchableOpacity>
 
                     <TouchableOpacity onPress={onClose}>
                         <Text style={styles.skipText}>I will give it later, skip for now</Text>
@@ -463,8 +497,8 @@ const styles = StyleSheet.create({
         color: '#888',
         fontSize: 14,
         textAlign: 'center',
-        marginTop: 1,
-        marginBottom: 25,
+        marginTop: 10,
+        marginBottom: 15,
         textDecorationLine: 'underline',
     },
     divider: {
@@ -519,7 +553,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#e0e0e0',
         marginTop: 5,
-        marginBottom: 50,
+        marginBottom: 20,
     },
     editingHeader: {
         marginBottom: 10,
@@ -533,18 +567,17 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#4C9FD8',
     },
-    submitButton: {
+    doneButton: {
         backgroundColor: '#4CAF50',
-        height: 46,
+        height: 50,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-        width: '90%',
-        alignSelf: 'center',
         borderRadius: 8,
+        marginHorizontal: 20,
         marginBottom: 10,
     },
-    submitButtonText: {
+    doneButtonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
