@@ -57,7 +57,7 @@ export default function TodaysWorkScreen() {
         description: currentDescription.trim(),
         date: new Date().toLocaleDateString(),
       };
-      
+
       setWorkItems(prev => [newItem, ...prev]);
       setDescriptionModalVisible(false);
       setCapturedImage(null);
@@ -90,12 +90,12 @@ export default function TodaysWorkScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <StatusBar style="light" />
-      
+
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{room.name} Work Log</Text>
         <Text style={styles.headerSubtitle}>{property.name}</Text>
       </View>
-      
+
       {workItems.length > 0 ? (
         <FlatList
           data={workItems}
@@ -112,7 +112,7 @@ export default function TodaysWorkScreen() {
           </Text>
         </View>
       )}
-      
+
       <View style={styles.addButtonContainer}>
         <TouchableOpacity style={styles.addButton} onPress={handleAddWorkItem}>
           <LinearGradient
@@ -126,7 +126,7 @@ export default function TodaysWorkScreen() {
           </LinearGradient>
         </TouchableOpacity>
       </View>
-      
+
       {/* Camera Modal */}
       <Modal
         visible={cameraVisible}
@@ -140,22 +140,22 @@ export default function TodaysWorkScreen() {
             ref={(ref) => setCamera(ref)}
           >
             <View style={styles.cameraControls}>
-              <TouchableOpacity 
-                style={styles.cameraControlButton} 
+              <TouchableOpacity
+                style={styles.cameraControlButton}
                 onPress={() => setCameraVisible(false)}
               >
                 <Ionicons name="close" size={28} color="white" />
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.captureButton} 
+
+              <TouchableOpacity
+                style={styles.captureButton}
                 onPress={handleTakePicture}
               >
                 <View style={styles.captureButtonInner} />
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.cameraControlButton} 
+
+              <TouchableOpacity
+                style={styles.cameraControlButton}
                 onPress={handleToggleCameraType}
               >
                 <Ionicons name="camera-reverse" size={28} color="white" />
@@ -164,7 +164,7 @@ export default function TodaysWorkScreen() {
           </CameraView>
         </View>
       </Modal>
-      
+
       {/* Description Modal */}
       <Modal
         visible={descriptionModalVisible}
@@ -175,15 +175,15 @@ export default function TodaysWorkScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Add Work Description</Text>
-            
+
             {capturedImage && (
-              <Image 
-                source={{ uri: capturedImage }} 
-                style={styles.previewImage} 
+              <Image
+                source={{ uri: capturedImage }}
+                style={styles.previewImage}
                 resizeMode="cover"
               />
             )}
-            
+
             <TextInput
               style={styles.descriptionInput}
               placeholder="Describe the work done..."
@@ -191,10 +191,10 @@ export default function TodaysWorkScreen() {
               value={currentDescription}
               onChangeText={setCurrentDescription}
             />
-            
+
             <View style={styles.modalButtons}>
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]} 
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
                 onPress={() => {
                   setDescriptionModalVisible(false);
                   setCapturedImage(null);
@@ -202,9 +202,9 @@ export default function TodaysWorkScreen() {
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.saveButton]} 
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
                 onPress={handleSaveWorkItem}
               >
                 <Text style={styles.saveButtonText}>Save</Text>

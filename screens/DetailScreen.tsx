@@ -7,6 +7,9 @@ import { MaterialIcons, Ionicons, FontAwesome5, Entypo, MaterialCommunityIcons }
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@/theme/ThemeProvider';
+import { getRoomGradientColors } from '@/theme/applicationTheme';
+import createThemedStyles from '@/theme/createThemedStyles';
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 type DetailScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Detail'>;
@@ -96,10 +99,11 @@ export default function DetailScreen() {
   const navigation = useNavigation<DetailScreenNavigationProp>();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const screenWidth = Dimensions.get('window').width;
+  const theme = useTheme();
 
   const renderRoomCard = ({ item }: { item: Room }) => (
     <View style={styles.roomCardContainer}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.roomCard}
         onPress={() => navigation.navigate('RoomDetail', { room: item, property })}
       >
@@ -112,16 +116,16 @@ export default function DetailScreen() {
           <MaterialIcons name={item.icon as any} size={36} color="white" />
           <Text style={styles.roomName}>{item.name}</Text>
         </LinearGradient>
-        
+
         <View style={styles.roomCardActions}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.actionButton}
             onPress={() => navigation.navigate('RoomDetail', { room: item, property })}
           >
             <Text style={styles.actionButtonText}>View Details</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.actionButton, styles.actionButtonSecondary]}
             onPress={() => navigation.navigate('TodaysWork', { room: item, property })}
           >
@@ -133,15 +137,7 @@ export default function DetailScreen() {
   );
 
   const getGradientColors = (id: string): string[] => {
-    const colorSets = [
-      ['#FF5E62', '#FF9966'], // Reddish-orange gradient
-      ['#4ECDC4', '#556270'], // Teal-gray gradient
-      ['#7F7FD5', '#91EAE4'], // Purple-blue gradient
-      ['#D66D75', '#E29587'], // Rose gradient
-      ['#6190E8', '#A7BFE8'], // Blue gradient
-    ];
-    
-    return colorSets[Number(id) % colorSets.length];
+    return getRoomGradientColors(id);
   };
 
   return (
@@ -164,57 +160,57 @@ export default function DetailScreen() {
             }}
             keyExtractor={(_, index) => index.toString()}
           />
-          
+
           {/* Image Indicators */}
           <View style={styles.imageIndicators}>
             {property.images.map((_, index) => (
-              <View 
-                key={index} 
+              <View
+                key={index}
                 style={[
-                  styles.indicator, 
+                  styles.indicator,
                   activeImageIndex === index && styles.activeIndicator
-                ]} 
+                ]}
               />
             ))}
           </View>
         </View>
-        
+
         {/* Property Details */}
         <View style={styles.detailsSection}>
           <Text style={styles.propertyName}>{property.name}</Text>
-          
+
           <View style={styles.locationContainer}>
-            <Ionicons name="location-sharp" size={18} color="#4d89ff" />
+            <Ionicons name="location-sharp" size={18} color={theme.info} />
             <Text style={styles.locationText}>{property.location}</Text>
           </View>
-          
+
           <Text style={styles.description}>{property.description}</Text>
-          
+
           <View style={styles.specs}>
             <View style={styles.specItem}>
-              <MaterialIcons name="square-foot" size={22} color="#4d89ff" />
+              <MaterialIcons name="square-foot" size={22} color={theme.info} />
               <Text style={styles.specValue}>{property.area}</Text>
               <Text style={styles.specLabel}>Area</Text>
             </View>
-            
+
             <View style={styles.specDivider} />
-            
+
             <View style={styles.specItem}>
-              <FontAwesome5 name="home" size={20} color="#4d89ff" />
+              <FontAwesome5 name="home" size={20} color={theme.info} />
               <Text style={styles.specValue}>{property.bhk}</Text>
               <Text style={styles.specLabel}>Type</Text>
             </View>
-            
+
             <View style={styles.specDivider} />
-            
+
             <View style={styles.specItem}>
-              <MaterialIcons name="attach-money" size={22} color="#4d89ff" />
+              <MaterialIcons name="attach-money" size={22} color={theme.info} />
               <Text style={styles.specValue}>{property.price}</Text>
               <Text style={styles.specLabel}>Price</Text>
             </View>
           </View>
         </View>
-        
+
         {/* Room Cards */}
         <View style={styles.roomsSection}>
           <Text style={styles.sectionTitle}>Explore Rooms</Text>
@@ -231,10 +227,12 @@ export default function DetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = createThemedStyles((theme) => ({
+  // Define styles using theme
+
   container: {
     flex: 1,
-    backgroundColor: '#f7f9fc',
+    backgroundColor: theme.background.main,
   },
   imageContainer: {
     height: 250,
@@ -250,22 +248,22 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: theme.text.onPrimaryFaded,
     marginHorizontal: 4,
   },
   activeIndicator: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.text.onPrimary,
     width: 10,
     height: 10,
     borderRadius: 5,
   },
   detailsSection: {
-    backgroundColor: 'white',
+    backgroundColor: theme.background.card,
     padding: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: theme.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -274,7 +272,7 @@ const styles = StyleSheet.create({
   propertyName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: theme.text.primary,
     marginBottom: 8,
   },
   locationContainer: {
@@ -284,19 +282,19 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 14,
-    color: '#555',
+    color: theme.text.secondary,
     marginLeft: 4,
   },
   description: {
     fontSize: 15,
-    color: '#555',
+    color: theme.text.secondary,
     lineHeight: 22,
     marginBottom: 20,
   },
   specs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#f8f9fb',
+    backgroundColor: theme.background.light,
     borderRadius: 12,
     padding: 16,
   },
@@ -307,18 +305,18 @@ const styles = StyleSheet.create({
   specValue: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#333',
+    color: theme.text.primary,
     marginTop: 8,
     marginBottom: 2,
   },
   specLabel: {
     fontSize: 12,
-    color: '#888',
+    color: theme.text.tertiary,
   },
   specDivider: {
     width: 1,
     height: '80%',
-    backgroundColor: '#ddd',
+    backgroundColor: theme.border.light,
     alignSelf: 'center',
   },
   roomsSection: {
@@ -327,7 +325,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: theme.text.primary,
     marginBottom: 16,
   },
   roomCardContainer: {
@@ -335,10 +333,10 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   roomCard: {
-    backgroundColor: 'white',
+    backgroundColor: theme.background.card,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
+    shadowColor: theme.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -351,7 +349,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   roomName: {
-    color: 'white',
+    color: theme.text.onPrimary,
     fontWeight: 'bold',
     fontSize: 16,
     marginTop: 8,
@@ -360,25 +358,28 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   actionButton: {
-    backgroundColor: '#4d89ff',
+    backgroundColor: theme.primary,
     borderRadius: 8,
     paddingVertical: 8,
     alignItems: 'center',
     marginBottom: 8,
   },
   actionButtonSecondary: {
-    backgroundColor: 'white',
+    backgroundColor: theme.background.card,
     borderWidth: 1,
-    borderColor: '#4d89ff',
+    borderColor: theme.primary,
   },
   actionButtonText: {
-    color: 'white',
+    color: theme.text.onPrimary,
     fontWeight: '600',
     fontSize: 12,
   },
   actionButtonTextSecondary: {
-    color: '#4d89ff',
+    color: theme.primary,
     fontWeight: '600',
     fontSize: 12,
   },
-});
+}));
+
+// Use the created styles function
+const styles = createStyles();

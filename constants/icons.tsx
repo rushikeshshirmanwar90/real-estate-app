@@ -19,11 +19,11 @@ const paymentsIcon = {
 export const useTabIcons = () => {
     const [userData, setUserData] = useState<User | undefined>(undefined);
     const [icons, setIcons] = useState(baseIcons);
-    
+
     useEffect(() => {
         getUserDetails(setUserData);
     }, []);
-    
+
     useEffect(() => {
         if (userData) {
             if (userData.userType !== 'customer') {
@@ -35,6 +35,6 @@ export const useTabIcons = () => {
             }
         }
     }, [userData]);
-    
+
     return { icons, isCustomer: userData?.userType === 'customer' };
 };

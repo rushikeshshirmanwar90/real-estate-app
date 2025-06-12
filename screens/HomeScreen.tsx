@@ -7,6 +7,8 @@ import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@/theme/ThemeProvider';
+import createThemedStyles from '@/theme/createThemedStyles';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -59,6 +61,7 @@ const PROPERTIES: Property[] = [
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const screenWidth = Dimensions.get('window').width;
+  const theme = useTheme();
 
   const renderPropertyCard = ({ item }: { item: Property }) => (
     <TouchableOpacity
@@ -79,24 +82,24 @@ export default function HomeScreen() {
           <Text style={styles.price}>{item.price}</Text>
         </View>
       </View>
-      
+
       <View style={styles.cardBody}>
         <Text style={styles.title}>{item.name}</Text>
         <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
-        
+
         <View style={styles.locationContainer}>
-          <Ionicons name="location-sharp" size={14} color="#4d89ff" />
+          <Ionicons name="location-sharp" size={14} color={theme.info} />
           <Text style={styles.locationText}>{item.location}</Text>
         </View>
-        
+
         <View style={styles.detailsContainer}>
           <View style={styles.detailItem}>
-            <MaterialIcons name="square-foot" size={18} color="#4d89ff" />
+            <MaterialIcons name="square-foot" size={18} color={theme.info} />
             <Text style={styles.detailText}>{item.area}</Text>
           </View>
-          
+
           <View style={styles.detailItem}>
-            <FontAwesome5 name="home" size={16} color="#4d89ff" />
+            <FontAwesome5 name="home" size={16} color={theme.info} />
             <Text style={styles.detailText}>{item.bhk}</Text>
           </View>
         </View>
@@ -107,12 +110,12 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <StatusBar style="light" />
-      
+
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Find Your Dream Home</Text>
         <Text style={styles.headerSubtitle}>Explore our featured properties</Text>
       </View>
-      
+
       <FlatList
         data={PROPERTIES}
         renderItem={renderPropertyCard}
@@ -124,35 +127,37 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = createThemedStyles((theme) => ({
+  // Define styles using theme
+
   container: {
     flex: 1,
-    backgroundColor: '#f7f9fc',
+    backgroundColor: theme.background.main,
   },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#f7f9fc',
+    backgroundColor: theme.background.main,
   },
   headerTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: theme.text.primary,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: theme.text.secondary,
     marginBottom: 8,
   },
   listContainer: {
     padding: 12,
   },
   card: {
-    backgroundColor: 'white',
+    backgroundColor: theme.background.card,
     borderRadius: 12,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: theme.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -178,13 +183,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 10,
     left: 12,
-    backgroundColor: 'rgba(77, 137, 255, 0.9)',
+    backgroundColor: theme.primary + 'E6', // Adding E6 for 90% opacity (0.9)
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
   },
   price: {
-    color: 'white',
+    color: theme.text.onPrimary,
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -194,11 +199,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: theme.text.primary,
     marginBottom: 6,
   },
   description: {
-    color: '#666',
+    color: theme.text.secondary,
     fontSize: 14,
     marginBottom: 12,
     lineHeight: 20,
@@ -210,7 +215,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 14,
-    color: '#555',
+    color: theme.text.secondary,
     marginLeft: 4,
   },
   detailsContainer: {
@@ -218,7 +223,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: theme.border.light,
   },
   detailItem: {
     flexDirection: 'row',
@@ -227,7 +232,10 @@ const styles = StyleSheet.create({
   detailText: {
     marginLeft: 6,
     fontSize: 14,
-    color: '#555',
+    color: theme.text.secondary,
     fontWeight: '500',
   },
-});
+}));
+
+// Use the created styles function
+const styles = createStyles();

@@ -4,7 +4,9 @@ import { Building } from "@/types/building";
 
 export const getProject = async () => {
   try {
-    const res = await axios.get(`${domain}/api/project`);
+    const res = await axios.get(
+      `${domain}/api/project?clientId=676e84f57021012d6d8e2a3b`
+    );
     const data = res.data;
     return data;
   } catch (error: any) {

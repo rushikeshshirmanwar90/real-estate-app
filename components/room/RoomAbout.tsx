@@ -1,6 +1,8 @@
 // components/RoomAbout.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '@/theme/ThemeProvider';
+import createThemedStyles from '@/theme/createThemedStyles';
 
 interface RoomAboutProps {
     roomName: string;
@@ -9,6 +11,7 @@ interface RoomAboutProps {
 }
 
 export default function RoomAbout({ roomName, propertyName, area }: RoomAboutProps) {
+    const theme = useTheme();
     return (
         <View style={styles.additionalInfo}>
             <Text style={styles.sectionTitle}>About this {roomName}</Text>
@@ -22,14 +25,14 @@ export default function RoomAbout({ roomName, propertyName, area }: RoomAboutPro
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = createThemedStyles((theme) => ({
     additionalInfo: {
-        backgroundColor: 'white',
+        backgroundColor: theme.background.card,
         borderRadius: 16,
         padding: 16,
         marginTop: 16,
         marginBottom: 20,
-        shadowColor: '#000',
+        shadowColor: theme.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -38,12 +41,15 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: theme.text.primary,
         marginBottom: 16,
     },
     additionalInfoText: {
         fontSize: 15,
-        color: '#444',
+        color: theme.text.secondary,
         lineHeight: 22,
     },
-});
+}));
+
+// Use the created styles function
+const styles = createStyles();

@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { Toaster } from "sonner-native";
+import { ThemeProvider } from "../theme/ThemeProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,10 +26,12 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }}>
-      </Stack>
-      <Toaster position="bottom-center" />
-    </GestureHandlerRootView>
+    <ThemeProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+        </Stack>
+        <Toaster position="bottom-center" />
+      </GestureHandlerRootView>
+    </ThemeProvider>
   );
 }

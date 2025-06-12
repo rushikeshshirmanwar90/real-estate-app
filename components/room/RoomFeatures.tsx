@@ -2,12 +2,15 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '@/theme/ThemeProvider';
+import createThemedStyles from '@/theme/createThemedStyles';
 
 interface RoomFeaturesProps {
     features: string[];
 }
 
 export default function RoomFeatures({ features }: RoomFeaturesProps) {
+    const theme = useTheme();
     const getIconForFeature = (feature: string) => {
         const lowerFeature = feature.toLowerCase();
         if (lowerFeature.includes('flooring') || lowerFeature.includes('marble') || lowerFeature.includes('floor')) {
@@ -41,7 +44,7 @@ export default function RoomFeatures({ features }: RoomFeaturesProps) {
                     <MaterialIcons
                         name={getIconForFeature(feature) as any}
                         size={22}
-                        color="#4d89ff"
+                        color={theme.info}
                     />
                     <Text style={styles.featureText}>{feature}</Text>
                 </View>
@@ -50,13 +53,13 @@ export default function RoomFeatures({ features }: RoomFeaturesProps) {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = createThemedStyles((theme) => ({
     featuresContainer: {
-        backgroundColor: 'white',
+        backgroundColor: theme.background.card,
         borderRadius: 16,
         padding: 16,
         marginTop: 16,
-        shadowColor: '#000',
+        shadowColor: theme.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -65,7 +68,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: theme.text.primary,
         marginBottom: 16,
     },
     featureItem: {
@@ -74,11 +77,14 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         paddingBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
+        borderBottomColor: theme.border.light,
     },
     featureText: {
         fontSize: 15,
-        color: '#444',
+        color: theme.text.secondary,
         marginLeft: 12,
     },
-});
+}));
+
+// Use the created styles function
+const styles = createStyles();

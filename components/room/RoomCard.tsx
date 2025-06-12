@@ -5,6 +5,9 @@ import { useRouter } from 'expo-router';
 import { Room } from '@/types/types';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '@/theme/ThemeProvider';
+import { getRoomGradientColors } from '@/theme/applicationTheme';
+import createThemedStyles from '@/theme/createThemedStyles';
 
 interface RoomCardProps {
     room: Room;
@@ -13,23 +16,13 @@ interface RoomCardProps {
 
 export default function RoomCard({ room, propertyId }: RoomCardProps) {
     const router = useRouter();
-
-    const getGradientColors = (id: string): string[] => {
-        const colorSets = [
-            ['#FF5E62', '#FF9966'],
-            ['#4ECDC4', '#556270'],
-            ['#7F7FD5', '#91EAE4'],
-            ['#D66D75', '#E29587'],
-            ['#6190E8', '#A7BFE8'],
-        ];
-        return colorSets[Number(id) % colorSets.length];
-    };
+    const theme = useTheme();
 
     return (
         <View style={styles.roomCardContainer}>
             <TouchableOpacity style={styles.roomCard}>
                 <LinearGradient
-                    colors={getGradientColors(room.id)}
+                    colors={getRoomGradientColors(room.id)}
                     style={styles.roomCardGradient}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -58,16 +51,16 @@ export default function RoomCard({ room, propertyId }: RoomCardProps) {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = createThemedStyles((theme) => ({
     roomCardContainer: {
         width: '50%',
         padding: 6,
     },
     roomCard: {
-        backgroundColor: 'white',
+        backgroundColor: theme.background.card,
         borderRadius: 16,
         overflow: 'hidden',
-        shadowColor: '#000',
+        shadowColor: theme.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 6,
@@ -80,7 +73,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     roomName: {
-        color: 'white',
+        color: theme.text.onPrimary,
         fontWeight: 'bold',
         fontSize: 16,
         marginTop: 8,
@@ -89,25 +82,28 @@ const styles = StyleSheet.create({
         padding: 12,
     },
     actionButton: {
-        backgroundColor: '#4d89ff',
+        backgroundColor: theme.info,
         borderRadius: 8,
         paddingVertical: 8,
         alignItems: 'center',
         marginBottom: 8,
     },
     actionButtonSecondary: {
-        backgroundColor: 'white',
+        backgroundColor: theme.background.card,
         borderWidth: 1,
-        borderColor: '#4d89ff',
+        borderColor: theme.info,
     },
     actionButtonText: {
-        color: 'white',
+        color: theme.text.onPrimary,
         fontWeight: '600',
         fontSize: 12,
     },
     actionButtonTextSecondary: {
-        color: '#4d89ff',
+        color: theme.info,
         fontWeight: '600',
         fontSize: 12,
     },
-});
+}));
+
+// Use the created styles function
+const styles = createStyles();

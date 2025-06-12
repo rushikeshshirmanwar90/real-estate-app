@@ -3,6 +3,9 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '@/theme/ThemeProvider';
+import { getRoomGradientColors } from '@/theme/applicationTheme';
+import createThemedStyles from '@/theme/createThemedStyles';
 
 interface RoomHeaderProps {
     roomName: string;
@@ -12,20 +15,12 @@ interface RoomHeaderProps {
 }
 
 export default function RoomHeader({ roomName, roomIcon, propertyName, roomId }: RoomHeaderProps) {
-    const getGradientColors = (id: string): string[] => {
-        const colorSets = [
-            ['#FF5E62', '#FF9966'],
-            ['#4ECDC4', '#556270'],
-            ['#7F7FD5', '#91EAE4'],
-            ['#D66D75', '#E29587'],
-            ['#6190E8', '#A7BFE8'],
-        ];
-        return colorSets[Number(id) % colorSets.length];
-    };
+    // Use the theme from context
+    const theme = useTheme();
 
     return (
         <LinearGradient
-            colors={getGradientColors(roomId)}
+            colors={getRoomGradientColors(roomId)}
             style={styles.header}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -37,7 +32,8 @@ export default function RoomHeader({ roomName, roomIcon, propertyName, roomId }:
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = createThemedStyles((theme) => ({
+
     header: {
         padding: 24,
         alignItems: 'center',
@@ -53,7 +49,10 @@ const styles = StyleSheet.create({
     },
     propertyName: {
         fontSize: 16,
-        color: 'rgba(255, 255, 255, 0.9)',
+        color: theme.text.onPrimaryFaded,
         marginTop: 4,
     },
-});
+}));
+
+// Use the created styles function
+const styles = createStyles();
