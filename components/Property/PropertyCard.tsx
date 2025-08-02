@@ -10,8 +10,12 @@ interface PropertyCardProps {
 
 const { width } = Dimensions.get('window');
 
+
+
 export default function PropertyCard({ property }: PropertyCardProps) {
     const router = useRouter();
+
+    console.log(property)
 
     return (
         <View style={styles.card}>
@@ -47,7 +51,11 @@ export default function PropertyCard({ property }: PropertyCardProps) {
                 <View style={styles.actionContainer}>
                     <TouchableOpacity
                         style={styles.viewDetailsButton}
-                        onPress={() => router.push({ pathname: '/room-list/[id]', params: { id: property.id } })}
+                        // In PropertyCard
+                        onPress={() => {
+                            console.log('Navigating with ID:', property);
+                            router.push({ pathname: '/room-list/[id]', params: { id: `${property.id}` } });
+                        }}
                     >
                         <Text style={styles.viewDetailsText}>View Details</Text>
                     </TouchableOpacity>

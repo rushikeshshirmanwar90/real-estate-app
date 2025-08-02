@@ -1,12 +1,11 @@
 import axios from "axios";
 import { domain } from "../lib/domain";
 import { Building } from "@/types/building";
+import { clientId } from "@/client";
 
 export const getProject = async () => {
   try {
-    const res = await axios.get(
-      `${domain}/api/project?clientId=676e84f57021012d6d8e2a3b`
-    );
+    const res = await axios.get(`${domain}/api/project?clientId=${clientId}`);
     const data = res.data;
     return data;
   } catch (error: any) {
@@ -16,7 +15,9 @@ export const getProject = async () => {
 
 export const getSingleProject = async (id: string) => {
   try {
-    const res = await axios.get(`${domain}/api/project?id=${id}`);
+    const res = await axios.get(
+      `${domain}/api/project?id=${id}&clientId=${clientId}`
+    );
     const data = res.data;
     return data;
   } catch (error: any) {

@@ -1,11 +1,17 @@
 {
-  "leads": [
-    { "contactNumber": "957-989-6842", "name": "Rushikes Shrimanwar" },
-    { "contactNumber": "957-989-6842", "name": "Chinmay Shrimanwar" }
+  "bhk": "1",
+  "description": "Compact yet luxurious 1 bedroom apartments perfect for singles or couples.",
+  "flatName": "102",
+  "id": "",
+  "images": [
+    "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1742164663/e06dhbjkghab4tssudjx.jpg",
+    "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1742164662/zzvyo4wphrqkhjqrnpjy.jpg",
+    "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1742164664/ixnfx9h7uiduggcb88s6.jpg"
   ],
-  "referenceCustomer": {
-    "contactNumber": "9579896842",
-    "id": "67dfda4147fae5ccd5c0fde6",
-    "name": "Rushikesh Shrimanwar"
-  }
+  "location": "Shrinager nanded 1-10-113 Guru Gobind Singh Ji Road Kohinor City Kailash Nagar",
+  "projectId": "67b396c1827b34ec3620ec88",
+  "projectName": "Kameshwari Heights",
+  "title": "1 BHK Premium",
+  "totalArea": 650,
+  "video": "https://youtu.be/6gU7j1Mehgo?si=yvNhFRDupTDRMJwD"
 }

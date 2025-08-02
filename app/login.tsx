@@ -157,6 +157,7 @@ export default function LoginScreen() {
             if (result.success) {
                 const user = await getUser(email);
                 const jsonUser = JSON.stringify(user.isUser);
+                console.log(jsonUser);
                 await AsyncStorage.setItem("user", jsonUser);
                 toast.success("User logged in successfully");
                 router.replace({
@@ -180,7 +181,7 @@ export default function LoginScreen() {
                         <Text style={styles.welcomeText}>Welcome Back</Text>
                         <Text style={styles.stepTitle}>Enter your email</Text>
                         <Text style={styles.stepDescription}>
-                            Welcome to Shivai construction! Log in to explore your dream properties, manage listings, or connect with top real estate experts
+                            Welcome to Deshmukh Builders! Log in to explore your dream properties, manage listings, or connect with top real estate experts
                         </Text>
                         <View style={styles.inputContainer}>
                             <MaterialIcons name="email" size={20} color="#666" style={styles.inputIcon} />

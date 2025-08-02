@@ -39,9 +39,8 @@ export const getFlatData = async (
       if (item.propertyDetails.type === "flat") {
         const flatData = item.propertyDetails.data;
         const buildingDetails = item.propertyDetails.buildingDetails;
-
         return {
-          id: item.id,
+          id: item.flatId,
           title: flatData.title || "",
           description: flatData.description || "",
           totalArea: flatData.totalArea || 0,

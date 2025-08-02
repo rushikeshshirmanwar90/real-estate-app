@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
@@ -128,6 +128,7 @@ export default function RoomsList() {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.addButton}
+                    // Commenting out navigation as todaysWork route doesn't exist in app directory
                     onPress={() => {
                         router.push({ pathname: "/todaysWork/[id]", params: { id: '20' } });
                     }}
@@ -143,6 +144,8 @@ export default function RoomsList() {
             <Loading />
         );
     }
+
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -161,12 +164,12 @@ export default function RoomsList() {
                     ))
                 ) : (
                     <Text>No rooms found</Text>
+
                 )}
             </View>
         </SafeAreaView>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,

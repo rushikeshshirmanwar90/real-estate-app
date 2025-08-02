@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
+import { Alert, FlatList, StyleSheet, Text, View, Dimensions, TouchableOpacity, RefreshControl } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Property } from '@/types/types';
@@ -15,6 +15,7 @@ import { clientId } from '@/lib/client';
 import { getContact } from '@/lib/function/get-contact';
 import ReferralModal, { ReferenceData } from '@/components/reference-model/ReferenceModel';
 import { addReference } from '@/func/reference';
+import SiteEng from '@/components/user/SiteEng';
 
 const { width } = Dimensions.get('window');
 
@@ -23,12 +24,14 @@ const IndexScreen = () => {
     const [userData, setUserData] = useState<User | null>(null);
     const [propertyData, setPropertyData] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [contactsUploaded, setContactsUploaded] = useState(false);
     const [modalVisible, setModalVisible] = useState(true);
 
     useEffect(() => {
         getUserDetails(setUserData)
     }, [])
+
 
     const fetchFlatData = async () => {
         try {
@@ -38,6 +41,18 @@ const IndexScreen = () => {
             }
         } catch (error) {
             console.error("Error fetching flat data:", error);
+        }
+    };
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        try {
+            await fetchFlatData();
+        } catch (error) {
+            console.error("Error refreshing data:", error);
+            Alert.alert("Error", "Failed to refresh data. Please try again.");
+        } finally {
+            setRefreshing(false);
         }
     };
 
@@ -137,11 +152,18 @@ const IndexScreen = () => {
         }
     }
 
+    if (userData?.userType == "staff") {
+        return (
+            <SiteEng />
+        )
+    }
+
+
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar style="light" />
             <Header name={userData?.firstName} />
-
 
             <ReferralModal
                 visible={modalVisible}
@@ -156,6 +178,15 @@ const IndexScreen = () => {
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={styles.listContainer}
                     showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                            tintColor="#4d89ff"
+                            colors={['#4d89ff']}
+                            progressBackgroundColor="#ffffff"
+                        />
+                    }
                 />
             ) : (
                 <View style={styles.noDataContainer}>

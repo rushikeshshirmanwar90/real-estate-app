@@ -140,7 +140,7 @@ export default function RegistrationScreen() {
                         <Text style={styles.welcomeText}>Create Account</Text>
                         <Text style={styles.stepTitle}>Personal Information</Text>
                         <Text style={styles.stepDescription}>
-                            Join Shivai Construction today! Tell us a bit about yourself to get started.
+                            Join Deshmukh Builders! Tell us a bit about yourself to get started.
                         </Text>
 
                         {/* First Name */}

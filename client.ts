@@ -1,1 +1,1 @@
-export const clientId = "67d6d72a52f8dc7d3ae22917";
+export const clientId = "676e84f57021012d6d8e2a3b";

@@ -1,6 +1,6 @@
 import { View, FlatList, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import PropertyCard, { ProjectData } from '@/components/project-card'
+import PropertyCard, { ProjectData } from '@/components/PropertyCard'
 import { getProject } from '@/func/project';
 import { useRouter } from 'expo-router';
 import Loading from '@/components/Loading';

@@ -19,6 +19,7 @@ import { getUserDetails } from '@/lib/user';
 import { domain } from '@/lib/domain';
 import { scaleFont } from '@/utils/scaling';
 import { FlatInfo } from '@/types/profile';
+import { clientId } from '@/client';
 
 const UserProfile: React.FC = () => {
     const router = useRouter();
@@ -85,7 +86,7 @@ const UserProfile: React.FC = () => {
 
     const fetchProjects = async (): Promise<void> => {
         try {
-            const res = await axios.get(`${domain}/api/project`);
+            const res = await axios.get(`${domain}/api/project?clientId=${clientId}`);
             const data: Project[] = res.data;
             setProjects(data);
         } catch (error) {

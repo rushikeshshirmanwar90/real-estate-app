@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '@/components/Loading';
 
 const index = () => {
+
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
 
