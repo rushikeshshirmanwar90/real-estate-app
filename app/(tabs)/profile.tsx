@@ -147,6 +147,102 @@ const UserProfile: React.FC = () => {
                 onBarcodeScanned={handleBarCodeScanned}
             />
             <ScannedDataModal
+            
+            <View style={{ marginBottom: scaleFont(10), width : scaleFont(130), alignSelf : "flex-end" }}>
+                <RefreshButton onRefresh={referesh} />
+            </View>
+
+
+            {properties ? (
+                <View style={styles.propertiesContainer}>
+                    <View style={styles.sectionHeader}>
+                        <FontAwesome
+                            name="building-o"
+                            size={scaleFont(24)}
+                            color="#9333EA"
+                            style={styles.sectionIcon}
+                        />
+                        <View>
+                            <Text style={styles.sectionTitle}>My Properties</Text>
+                            <Text style={styles.sectionSubtitle}>View your payment details</Text>
+                        </View>
+                    </View>
+                    {properties.properties.map((property: Property, index: number) => (
+                        <View key={index} style={styles.propertyCard}>
+                            <View style={styles.propertyHeaderLine} />
+                            <Text style={styles.propertyTitle}>{property.projectName}</Text>
+                            <Text style={styles.propertySubtitle}>{property.sectionType}</Text>
+                            {property.payments && property.payments?.length > 0 ? (
+                                <View style={styles.paymentDetailsContainer}>
+                                    <Text style={styles.paymentSectionTitle}>Payment Details</Text>
+                                    {property.payments.map((payment: Payment, paymentIndex: number) => (
+                                        <View key={paymentIndex} style={styles.paymentItem}>
+                                            <View style={styles.paymentLabelContainer}>
+                                                <Text style={styles.paymentLabel}>{payment.title}</Text>
+                                                <Text style={styles.paymentDate}>{payment.date}</Text>
+                                            </View>
+                                            <Text style={styles.paymentValue}>{payment.percentage}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            ) : (
+                                <Text style={styles.noPaymentsText}>No payments recorded for this property.</Text>
+                            )}
+                        </View>
+                    ))}
+                </View>
+            ) : (
+                <Text style={styles.noPropertiesText}>No properties available.</Text>
+            )}
+
+            {/* Logout Button */}
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                <MaterialCommunityIcons name="logout-variant" size={scaleFont(20)} color="#A56CC1" style={styles.sectionIcon} />
+                <Text style={styles.logoutText}>Logout</Text>
+            </TouchableOpacity>
+
+            {/* QR Code Display Modal */}
+            <Modal visible={showQR} transparent={true} animationType="fade" onRequestClose={() => setShowQR(false)}>
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Personal QR Code</Text>
+                        <View style={styles.qrContainer}>
+                            <QRCode value={generateQRData()} size={width * 0.6} color="#333" backgroundColor="#FFF" />
+                        </View>
+                        <Text style={styles.qrDescription}>Scan this QR code to share your contact information</Text>
+                        <TouchableOpacity style={styles.closeButton} onPress={() => setShowQR(false)}>
+                            <Text style={styles.closeButtonText}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* QR Code Scanner Modal */}
+            <Modal visible={scanning} transparent={true} animationType="fade" onRequestClose={() => setScanning(false)}>
+                <View style={styles.scannerContainer}>
+                    {cameraPermission?.granted === false ? (
+                        <Text style={styles.scannerText}>No access to camera</Text>
+                    ) : (
+                        <CameraView
+                            style={styles.scanner}
+                            facing="back"
+                            barcodeScannerSettings={{
+                                barcodeTypes: ['qr'],
+                            }}
+                            onBarcodeScanned={handleBarCodeScanned}
+                        >
+                            <View style={styles.scannerOverlay}>
+                                <View style={styles.scannerMarker} />
+                            </View>
+                            <TouchableOpacity style={styles.cancelScanButton} onPress={() => setScanning(false)}>
+                                <Text style={styles.cancelScanText}>Cancel</Text>
+                            </TouchableOpacity>
+                        </CameraView>
+                    )}
+                </View>
+            </Modal>
+
+            {/* Scanned Data Modal */}
                 visible={showScannedData}
                 scannedData={scannedData}
                 projects={projects}
@@ -178,6 +274,27 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'flex-end',
         marginBottom: scaleFont(15),
+    },
+    qrText: {
+        fontSize: scaleFont(14),
+        color: '#000',
+        fontWeight: 'bold',
+        marginLeft: scaleFont(8),
+    },
+    logoutButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FFFFFF',
+        padding: scaleFont(12),
+        borderRadius: scaleFont(10),
+        marginBottom: scaleFont(16),
+    },
+    logoutText: {
+        fontSize: scaleFont(14),
+        color: '#A56CC1',
+        fontWeight: 'bold',
+        marginLeft: scaleFont(8),
     },
     bottomPadding: {
         height: scaleFont(16),
