@@ -1,15 +1,17 @@
-import { View, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { User } from '@/types/user';
-import { getUserDetails } from '@/lib/user';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ProjectData } from '../PropertyCard';
+import { View, FlatList, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ProjectData } from '@/components/PropertyCard'; // Import interface from PropertyCard
 import { getProject } from '@/func/project';
+import { useRouter } from 'expo-router';
+import Loading from '@/components/Loading';
+import ProjectCard from '@/components/ProjectCard'; // Correct import path
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const SiteEng = () => {
+const Explore = () => {
+    const router = useRouter();
 
     const [projects, setProjects] = useState<ProjectData[]>([]);
-    const [Loading, setLoading] = useState<boolean>();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,11 +40,44 @@ const SiteEng = () => {
         fetchData();
     }, []);
 
+    if (loading) {
+        return <Loading />
+    }
+
+    const handleAddUpdate = (projectId: string) => {
+        // Handle add update navigation or action
+        router.push({ pathname: '/updates/[id]', params: { id: projectId } });
+        // Or you can navigate to any other screen for adding updates
+    };
+
     return (
-        <SafeAreaView>
-
+        <SafeAreaView style={styles.container}>
+            <View style={styles.container}>
+                <FlatList
+                    data={projects}
+                    renderItem={({ item }) => (
+                        <ProjectCard
+                            project={item}
+                            onAddUpdate={() => handleAddUpdate(item._id)}
+                        />
+                    )}
+                    keyExtractor={item => item._id}
+                    contentContainerStyle={styles.listContainer}
+                    showsVerticalScrollIndicator={false}
+                />
+            </View>
         </SafeAreaView>
-    )
-}
+    );
+};
 
-export default SiteEng
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F5F7FA',
+    },
+    listContainer: {
+        paddingVertical: 10,
+    }
+});
+
+export default Explore;

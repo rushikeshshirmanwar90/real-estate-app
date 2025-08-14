@@ -8,16 +8,19 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { WorkItem } from '@/types/updates/RowHouseSection';
+import AddUpdateButton from '@/components/updates/row-house/AddButton';
 import UpdateCard from '@/components/updates/row-house/updateCard';
+import EnhancedCameraModal from '@/components/updates/EnhancedCameraModal';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
-const TodaysUpdate: React.FC = () => {
+const UpdatesScreen: React.FC = () => {
 
     const router = useRouter();
 
+    const [modalVisible, setModalVisible] = useState(false);
     const [workItems, setWorkItems] = useState<WorkItem[]>([
         {
             id: '1',
@@ -35,7 +38,28 @@ const TodaysUpdate: React.FC = () => {
         },
     ]);
 
+    const handleOpenModal = () => {
+        setModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalVisible(false);
+    };
+
+    const handleSaveWorkItem = (workItemData: Omit<WorkItem, 'id' | 'date'>) => {
+        const newWorkItem: WorkItem = {
+            ...workItemData,
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+        };
+
+        console.log(newWorkItem)
+
+        setWorkItems(prevItems => [newWorkItem, ...prevItems]);
+    };
+
     const handleCardPress = (workItem: WorkItem) => {
+        // Handle card press - you can navigate to detail screen or open modal
         console.log('Card pressed:', workItem.title);
     };
 
@@ -55,6 +79,12 @@ const TodaysUpdate: React.FC = () => {
             <StatusBar barStyle="dark-content" backgroundColor="#FFF8F0" />
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
                 <View style={styles.content}>
+                    {/* Header */}
+                    <Text style={styles.sectionTitle}>Add Updates</Text>
+
+                    {/* Add Update Button */}
+                    <AddUpdateButton backgroundColor='#E8F6E9' foregroundColor='#46A249' onPress={handleOpenModal} />
+
                     {/* All Recent Updates Section */}
                     <Text style={styles.sectionTitle}>All Recent Updates</Text>
 
@@ -72,6 +102,14 @@ const TodaysUpdate: React.FC = () => {
                 </View>
             </ScrollView>
 
+            {/* Enhanced Camera Modal */}
+            <EnhancedCameraModal
+                visible={modalVisible}
+                onClose={handleCloseModal}
+                onSave={handleSaveWorkItem}
+                updateType="general"
+                sectionName="Project"
+            />
         </SafeAreaView>
     );
 };
@@ -121,4 +159,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TodaysUpdate;
+export default UpdatesScreen;

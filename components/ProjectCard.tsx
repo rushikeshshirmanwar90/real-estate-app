@@ -29,6 +29,7 @@ const ProjectCard = ({ project, onAddUpdate }: ProjectCardProps) => {
 
     return (
         <View style={styles.cardContainer}>
+            {/* Left side - Image */}
             <View style={styles.imageContainer}>
                 {project.images && project.images.length > 0 ? (
                     <Image
@@ -44,35 +45,49 @@ const ProjectCard = ({ project, onAddUpdate }: ProjectCardProps) => {
                 )}
             </View>
 
+            {/* Right side - Content */}
             <View style={styles.contentSection}>
-                <Text style={styles.title}>{project.name}</Text>
+                <View style={styles.headerSection}>
+                    <Text style={styles.title} numberOfLines={2}>{project.name}</Text>
 
-                <View style={styles.locationContainer}>
-                    <EvilIcons name="location" size={20} color="black" />
-                    <Text style={styles.locationText}>
-                        {project.city}, {project.state}
-                    </Text>
+                    <View style={styles.locationContainer}>
+                        <View style={styles.locationIconContainer}>
+                            <EvilIcons name="location" size={20} color="#9CA3AF" />
+                        </View>
+                        <Text style={styles.locationText} numberOfLines={1}>
+                            {project.city}, {project.state}
+                        </Text>
+                    </View>
                 </View>
 
-                <View style={styles.areaContainer}>
-                    <Text style={styles.infoLabel}>Area:</Text>
-                    <Text style={styles.infoValue}>{project.area} sq.ft</Text>
+                <View style={styles.areaSection}>
+                    <Text style={styles.areaLabel}>Area</Text>
+                    <Text style={styles.areaValue}>{project.area} sq.ft</Text>
                 </View>
 
                 <View style={styles.sectionsWrapper}>
                     <Text style={styles.sectionTitle}>Sections:</Text>
                     <View style={styles.sectionsContainer}>
-                        {project.section.map((section, index) => (
-                            <Text key={section._id || index} style={styles.sectionItem}>
-                                {section.name} ({section.type})
-                            </Text>
+                        {project.section.slice(0, 3).map((section, index) => (
+                            <View key={section._id || index} style={styles.sectionItem}>
+                                <Text style={styles.sectionText} numberOfLines={1}>
+                                    {section.name} ({section.type})
+                                </Text>
+                            </View>
                         ))}
+                        {project.section.length > 3 && (
+                            <View style={styles.moreSection}>
+                                <Text style={styles.moreSectionText}>
+                                    +{project.section.length - 3} more
+                                </Text>
+                            </View>
+                        )}
                     </View>
                 </View>
 
                 <TouchableOpacity style={styles.button} onPress={onAddUpdate}>
-                    <Icon name="plus" size={16} color="#fff" style={styles.buttonIcon} />
                     <Text style={styles.buttonText}>Add Update</Text>
+                    <Icon name="arrow-right" size={14} color="#fff" style={styles.buttonIcon} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -81,108 +96,144 @@ const ProjectCard = ({ project, onAddUpdate }: ProjectCardProps) => {
 
 const styles = StyleSheet.create({
     cardContainer: {
-        width: width * 0.45, // Smaller width for vertical layout
-        backgroundColor: '#F5F7FA',
-        borderRadius: 12,
+        width: width * 0.92,
+        height: 260,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
         overflow: 'hidden',
-        marginVertical: 8,
-        marginHorizontal: 5,
-        elevation: 3,
+        marginVertical: 12,
+        marginHorizontal: width * 0.04,
+        elevation: 6,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 8,
+        flexDirection: 'row',
     },
     imageContainer: {
-        height: 120,
-        width: '100%',
+        width: '42%',
+        height: '100%',
+        borderTopLeftRadius: 16,
+        borderBottomLeftRadius: 16,
+        overflow: 'hidden',
     },
     imageSection: {
-        height: '100%',
         width: '100%',
-        objectFit: "cover",
+        height: '100%',
     },
     contentSection: {
-        padding: 12,
-        backgroundColor: '#fff',
         flex: 1,
+        padding: 20,
+        justifyContent: 'space-between',
+        backgroundColor: '#FFFFFF',
+    },
+    headerSection: {
+        marginBottom: 4,
     },
     title: {
-        fontSize: width * 0.038,
-        fontWeight: 'bold',
-        color: '#2E3A59',
-        marginBottom: 6,
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#1F2937',
+        marginBottom: 10,
+        lineHeight: 24,
     },
     locationContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 4,
+    },
+    locationIconContainer: {
+        marginRight: 6,
+        marginTop: 2,
     },
     locationText: {
-        fontSize: width * 0.032,
-        color: '#7D8FAB',
-        marginLeft: 4,
+        fontSize: 14,
+        color: '#6B7280',
         flex: 1,
+        lineHeight: 18,
     },
-    areaContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
+    areaSection: {
+        marginBottom: 16,
+        paddingVertical: 4,
     },
-    infoLabel: {
-        fontSize: width * 0.03,
-        color: '#7D8FAB',
-        marginRight: 5,
+    areaLabel: {
+        fontSize: 12,
+        color: '#9CA3AF',
+        marginBottom: 3,
+        fontWeight: '500',
+        textTransform: 'uppercase',
+        letterSpacing: 0.3,
     },
-    infoValue: {
-        fontSize: width * 0.032,
-        fontWeight: 'bold',
-        color: '#2E3A59',
+    areaValue: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#1F2937',
+        lineHeight: 20,
     },
     sectionsWrapper: {
-        marginBottom: 12,
+        marginBottom: 20,
         flex: 1,
     },
     sectionTitle: {
-        fontSize: width * 0.032,
-        fontWeight: 'bold',
-        color: '#2E3A59',
-        marginBottom: 6,
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: 8,
     },
     sectionsContainer: {
-        flexDirection: "column",
-        gap: 4,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
     },
     sectionItem: {
-        fontSize: width * 0.028,
-        fontWeight: "500",
-        backgroundColor: '#F9FAFB',
-        color: '#000',
-        borderColor: '#EAEAEA',
-        borderWidth: 1,
-        paddingVertical: 4,
-        paddingHorizontal: 8,
+        backgroundColor: '#F3F4F6',
         borderRadius: 6,
-        textAlign: 'center',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    sectionText: {
+        fontSize: 12,
+        color: '#4B5563',
+        fontWeight: '500',
+    },
+    moreSection: {
+        backgroundColor: '#EEF2FF',
+        borderRadius: 6,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: '#C7D2FE',
+    },
+    moreSectionText: {
+        fontSize: 12,
+        color: '#6366F1',
+        fontWeight: '600',
     },
     button: {
         flexDirection: 'row',
-        backgroundColor: '#6B48FF',
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        borderRadius: 8,
+        backgroundColor: '#6366F1',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 'auto', // Push button to bottom
+        alignSelf: 'stretch',
+        elevation: 2,
+        shadowColor: '#6366F1',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
     },
     buttonText: {
-        color: '#fff',
-        fontSize: width * 0.035,
-        fontWeight: 'bold',
-        marginLeft: 5,
+        color: '#FFFFFF',
+        fontSize: 15,
+        fontWeight: '600',
+        letterSpacing: 0.3,
     },
     buttonIcon: {
-        marginRight: 2,
+        marginLeft: 8,
     },
 });
 

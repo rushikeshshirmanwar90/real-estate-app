@@ -1,17 +1,1 @@
-{
-  "bhk": "1",
-  "description": "Compact yet luxurious 1 bedroom apartments perfect for singles or couples.",
-  "flatName": "102",
-  "id": "",
-  "images": [
-    "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1742164663/e06dhbjkghab4tssudjx.jpg",
-    "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1742164662/zzvyo4wphrqkhjqrnpjy.jpg",
-    "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1742164664/ixnfx9h7uiduggcb88s6.jpg"
-  ],
-  "location": "Shrinager nanded 1-10-113 Guru Gobind Singh Ji Road Kohinor City Kailash Nagar",
-  "projectId": "67b396c1827b34ec3620ec88",
-  "projectName": "Kameshwari Heights",
-  "title": "1 BHK Premium",
-  "totalArea": 650,
-  "video": "https://youtu.be/6gU7j1Mehgo?si=yvNhFRDupTDRMJwD"
-}
+ [{"__v": 0, "_id": "67b396c1827b34ec3620ec88", "address": "Shrinager nanded 1-10-113 Guru Gobind Singh Ji Road Kohinor City Kailash Nagar", "area": "25000", "city": "Nanded-Waghala", "clientId": "676e84f57021012d6d8e2a3b", "createdAt": "2025-02-17T20:06:25.048Z", "description": "this is the some description about the project", "images": ["https://res.cloudinary.com/dlcq8i2sc/image/upload/v1739822766/wvy5me8czuseljmp1t5z.jpg", "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1739822766/znuo23znw8lfbytz62tn.jpg", "https://res.cloudinary.com/dlcq8i2sc/image/upload/v1739822765/xiccroknbmugvij6uo9s.jpg"], "latitude": 0, "longitude": 0, "name": "Kameshwari Heights", "projectType": "upcoming", "section": [[Object], [Object], [Object]], "state": "Maharashtra", "updatedAt": "2025-08-03T17:12:00.506Z"}]

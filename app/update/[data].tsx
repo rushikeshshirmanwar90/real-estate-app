@@ -9,13 +9,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { domain } from '@/lib/domain';
 import { User, Update, UploadProgress, ProjectInfo } from '@/types/update';
-import EmptyState from '@/components/updates/EmptyState';
-import UpdateCard from '@/components/updates/UpdateCard';
-import FloatingButtons from '@/components/updates/FloatingButtons';
-import UpdateModal from '@/components/updates/UpdateModel';
-import ReviewModal from '@/components/updates/ReviewModel';
-
-const { width } = Dimensions.get('window');
+import EmptyState from '@/components/update/EmptyState';
+import UpdateCard from '@/components/update/UpdateCard';
+import FloatingButtons from '@/components/update/FloatingButtons';
+import UpdateModal from '@/components/update/UpdateModel';
+import ReviewModal from '@/components/update/ReviewModel';
 
 const getUserDetails = async (setUserData: React.Dispatch<React.SetStateAction<User | null>>) => {
     try {
