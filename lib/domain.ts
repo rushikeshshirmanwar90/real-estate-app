@@ -1,4 +1,4 @@
-export const domain = "https://real-estate-web-pied.vercel.app";
+export const domain = "https://real-estate-apis.vercel.app";
 // export const domain = "http://192.168.156.135:8080";
 // export const domain = "http://192.168.10.135:8080";
 // export const domain = "http://192.168.158.135:8080";
